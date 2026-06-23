@@ -13,9 +13,12 @@ connectDB();
 app.use (cors());
 app.use(express.json());
 app.use(cookieParser());
+app.use(cors({
+  origin: 'http://localhost:5173', // Apne Vite frontend ka exact link dain
+  credentials: true, // Yeh true karna lazmi hai cookies ko allow karne k liye
+}));
 
 app.use('/api/auth', authRouter);
-
 const PORT = process.env.PORT || 5000;
 
   app.listen(PORT, () => {
