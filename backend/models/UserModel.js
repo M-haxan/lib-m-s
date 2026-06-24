@@ -14,16 +14,15 @@ import mongoose from "mongoose";
     },
     role:{
         type:String,
-        enum:["student", "admin"],
         default: "student"
     }, 
     stream:{
         type:String,
-        required: function() { return this.role === "student"; }
+        required: true
     },
     year:{
         type: Number,
-       required: function() { return this.role === "student"; }
+       required: true
     }
  })
 const UserModel = mongoose.model("User", userSchema)
