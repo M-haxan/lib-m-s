@@ -3,16 +3,16 @@ import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin } from 'react-icons/fa';
 
 export default function Footer() {
   return (
-    <footer className="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-8 mt-auto">
+    <footer className="bg-slate-100 py-8 mt-auto">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
         
         {/* Copyright */}
-        <div className="text-slate-500 dark:text-slate-400 text-sm">
+        <div className="text-slate-500 dark:text-slate-500 text-sm">
           &copy; {new Date().getFullYear()} Libro Library. All rights reserved.
         </div>
 
         {/* Links */}
-        <div className="flex space-x-6 text-sm font-medium text-slate-600 dark:text-slate-300">
+        <div className="flex space-x-6 text-sm font-medium text-slate-500 dark:text-slate-500">
           <Link to="#" className="hover:text-blue-600 transition-colors">About</Link>
           <Link to="#" className="hover:text-blue-600 transition-colors">Help/FAQ</Link>
           <Link to="#" className="hover:text-blue-600 transition-colors">Contact Admin</Link>

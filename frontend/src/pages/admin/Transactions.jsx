@@ -150,7 +150,7 @@ export default function Transactions() {
                       </span>
                       {txn.fineAmount > 0 && (
                         <div className={`mt-2 text-xs font-bold ${txn.finePaid ? 'text-emerald-500' : 'text-rose-600'}`}>
-                          Fine: ${txn.fineAmount} ({txn.finePaid ? 'Paid' : 'Unpaid'})
+                          Fine: PKR {txn.fineAmount} ({txn.finePaid ? 'Paid' : 'Unpaid'})
                         </div>
                       )}
                     </td>

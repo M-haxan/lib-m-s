@@ -2,6 +2,7 @@ import {BrowserRouter, Routes, Route, Outlet} from 'react-router-dom'
 import Signin from './pages/Signin'
 import Signup from './pages/Signup'
 import Home from './pages/Home'
+import Catalog from './pages/Catalog'
 import BookDetails from './pages/BookDetails'
 import { Toaster } from 'react-hot-toast';
 import AdminRoute from './components/AdminRoute';
@@ -12,6 +13,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 
 import Transactions from './pages/admin/Transactions';
+import ManageUsers from './pages/admin/ManageUsers';
 import Analytics from './pages/admin/Analytics';
 import StudentDashboard from './pages/StudentDashboard';
 
@@ -25,6 +27,7 @@ function App() {
      <main className="flex-1 flex flex-col">
        <Routes>
         <Route path='/' element={<Home />} />
+        <Route path='/catalog' element={<Catalog />} />
         <Route path='/book/:id' element={<BookDetails />} />
         <Route path='/signin' element= {<Signin/>}/>
         <Route path='/signup' element= {<Signup/>}/>
@@ -35,9 +38,10 @@ function App() {
         
         <Route element={<AdminRoute />}>
           <Route path='/admin-dashboard' element={<AdminDashboard />}>
+             <Route index element={<Analytics />} />
              <Route path='manage-books' element={<ManageBooks />} />
              <Route path='transactions' element={<Transactions />} />
-             <Route path='analytics' element={<Analytics />} />
+             <Route path='manage-users' element={<ManageUsers />} />
           </Route>
         </Route>
        </Routes>

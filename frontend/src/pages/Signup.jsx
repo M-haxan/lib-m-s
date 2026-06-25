@@ -40,7 +40,7 @@ function Signup() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-5rem)] bg-slate-100 flex items-center justify-center p-4">
+    <div className="min-h-[calc(100vh-5rem)] bg-[#ECF1FB] flex items-center justify-center p-4">
 
 <div className="relative bg-white rounded-[2rem] shadow-lg w-full max-w-sm pt-16 pb-8 px-6 sm:px-10 mt-16">
 

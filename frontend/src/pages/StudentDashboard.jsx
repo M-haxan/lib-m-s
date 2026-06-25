@@ -61,7 +61,7 @@ export default function StudentDashboard() {
             <div className="bg-rose-50 dark:bg-rose-900/20 px-6 py-4 rounded-2xl border border-rose-100 dark:border-rose-900/50">
               <p className="text-sm text-rose-600 dark:text-rose-400 font-medium">Pending Fines</p>
               <p className="text-3xl font-bold text-rose-700 dark:text-rose-300">
-                ${transactions.reduce((acc, curr) => (!curr.finePaid ? acc + curr.fineAmount : acc), 0)}
+                PKR {transactions.reduce((acc, curr) => (!curr.finePaid ? acc + curr.fineAmount : acc), 0)}
               </p>
             </div>
           </div>

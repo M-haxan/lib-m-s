@@ -50,10 +50,10 @@ export default function AdminDashboard() {
             <span>Issue / Return</span>
           </Link>
           <Link
-            to="/admin-dashboard/analytics"
-            className={`flex items-center space-x-3 p-3 rounded-xl transition-all duration-200 ${location.pathname.includes('/analytics') ? 'bg-blue-600 text-white shadow-md shadow-blue-500/30' : 'hover:bg-slate-100 dark:hover:bg-slate-700'}`}
+            to="/admin-dashboard/manage-users"
+            className={`flex items-center space-x-3 p-3 rounded-xl transition-all duration-200 ${location.pathname.includes('/manage-users') ? 'bg-blue-600 text-white shadow-md shadow-blue-500/30' : 'hover:bg-slate-100 dark:hover:bg-slate-700'}`}
           >
-            <span>Analytics</span>
+            <span>Users</span>
           </Link>
         </nav>
         <div className="p-4 border-t border-slate-200 dark:border-slate-700">
