@@ -1,10 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+
+const fetchBooks = async () => {
+  const { data } = await axios.get('/api/books');
+  return data;
+};
 
 export default function ManageBooks() {
-  const [books, setBooks] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const queryClient = useQueryClient();
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
     title: '', author: '', isbn: '', category: '', publisher: '', year: '', quantity: '', imageUrl: ''
@@ -12,21 +17,41 @@ export default function ManageBooks() {
   const [uploading, setUploading] = useState(false);
   const [editId, setEditId] = useState(null);
 
-  useEffect(() => {
-    fetchBooks();
-  }, []);
+  const { data: books = [], isLoading } = useQuery({
+    queryKey: ['books'],
+    queryFn: fetchBooks,
+    staleTime: 30000,
+  });
 
-  const fetchBooks = async () => {
-    try {
-      setLoading(true);
-      const { data } = await axios.get('/api/books');
-      setBooks(data);
-    } catch (error) {
-      toast.error('Failed to fetch books');
-    } finally {
-      setLoading(false);
+  const createOrUpdateBookMutation = useMutation({
+    mutationFn: async (payload) => {
+      if (editId) {
+        return axios.put(`/api/books/${editId}`, payload, { withCredentials: true });
+      }
+      return axios.post('/api/books', payload, { withCredentials: true });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['books'] });
+      setShowModal(false);
+      setFormData({ title: '', author: '', isbn: '', category: '', publisher: '', year: '', quantity: '', imageUrl: '' });
+      setEditId(null);
+      toast.success(editId ? 'Book updated successfully' : 'Book added successfully');
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message || 'Something went wrong');
     }
-  };
+  });
+
+  const deleteBookMutation = useMutation({
+    mutationFn: async (id) => axios.delete(`/api/books/${id}`, { withCredentials: true }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['books'] });
+      toast.success('Book deleted');
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message || 'Failed to delete');
+    }
+  });
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -36,23 +61,22 @@ export default function ManageBooks() {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Cloudinary upload
     const data = new FormData();
-    data.append("file", file);
-    data.append("upload_preset", "library_preset"); // Change this to your Cloudinary preset
-    data.append("cloud_name", "dzizbm5s7"); // Change this
+    data.append('file', file);
+    data.append('upload_preset', 'library_preset');
+    data.append('cloud_name', 'dzizbm5s7');
 
     try {
       setUploading(true);
-      const res = await fetch("https://api.cloudinary.com/v1_1/dzizbm5s7/image/upload", {
-        method: "POST",
+      const res = await fetch('https://api.cloudinary.com/v1_1/dzizbm5s7/image/upload', {
+        method: 'POST',
         body: data
       });
       const resData = await res.json();
       setFormData({ ...formData, imageUrl: resData.secure_url });
-      toast.success("Image uploaded!");
+      toast.success('Image uploaded!');
     } catch (error) {
-      toast.error("Image upload failed");
+      toast.error('Image upload failed');
     } finally {
       setUploading(false);
     }
@@ -60,21 +84,7 @@ export default function ManageBooks() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      if (editId) {
-        await axios.put(`/api/books/${editId}`, formData, { withCredentials: true });
-        toast.success("Book updated successfully");
-      } else {
-        await axios.post('/api/books', formData, { withCredentials: true });
-        toast.success("Book added successfully");
-      }
-      setShowModal(false);
-      setFormData({ title: '', author: '', isbn: '', category: '', publisher: '', year: '', quantity: '', imageUrl: '' });
-      setEditId(null);
-      fetchBooks();
-    } catch (error) {
-      toast.error(error.response?.data?.message || 'Something went wrong');
-    }
+    createOrUpdateBookMutation.mutate(formData);
   };
 
   const handleEdit = (book) => {
@@ -85,13 +95,7 @@ export default function ManageBooks() {
 
   const handleDelete = async (id) => {
     if (!confirm('Are you sure you want to delete this book?')) return;
-    try {
-      await axios.delete(`/api/books/${id}`, { withCredentials: true });
-      toast.success('Book deleted');
-      fetchBooks();
-    } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to delete');
-    }
+    deleteBookMutation.mutate(id);
   };
 
   return (
@@ -101,7 +105,7 @@ export default function ManageBooks() {
           <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Manage Books</h1>
           <p className="text-slate-500 dark:text-slate-400 mt-1">Add, update, or remove books from the library catalog.</p>
         </div>
-        <button 
+        <button
           onClick={() => { setEditId(null); setFormData({ title: '', author: '', isbn: '', category: '', publisher: '', year: '', quantity: '', imageUrl: '' }); setShowModal(true); }}
           className="px-6 py-3 bg-blue-500 text-white rounded shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 hover:-translate-y-0.5 transition-all font-medium"
         >
@@ -109,37 +113,36 @@ export default function ManageBooks() {
         </button>
       </div>
 
-      {/* Table */}
-      <div className="bg-white rounded shadow-sm border  overflow-hidden">
+      <div className="bg-white rounded shadow-sm border overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-slate-100  text-slate-500 text-sm uppercase tracking-wider">
+              <tr className="bg-slate-100 text-slate-500 text-sm uppercase tracking-wider">
                 <th className="px-6 py-4 font-medium">Cover</th>
                 <th className="px-6 py-4 font-medium">Book Details</th>
-                <th className="px-6 py-4 font-medium">Category</th>
+                <th className="px-8 py-4 font-medium">Category</th>
                 <th className="px-6 py-4 font-medium">Stock</th>
                 <th className="px-6 py-4 font-medium text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
-              {loading ? (
+              {isLoading ? (
                 <tr><td colSpan="5" className="px-6 py-8 text-center text-slate-500 animate-pulse">Loading books...</td></tr>
               ) : books.length === 0 ? (
                 <tr><td colSpan="5" className="px-6 py-8 text-center text-slate-500">No books found. Add some!</td></tr>
               ) : (
                 books.map((book) => (
-                  <tr key={book._id} className="hover:bg-slate-50  ">
+                  <tr key={book._id} className="hover:bg-slate-50">
                     <td className="px-6 py-4">
                       <img src={book.imageUrl || 'https://via.placeholder.com/150'} alt={book.title} className="w-12 h-16 object-cover rounded shadow-sm" />
                     </td>
                     <td className="px-6 py-4">
-                      <div className="font-semibold text-slate-500 font-bold capitalize ">{book.title}</div>
+                      <div className="font-semibold text-slate-500 font-bold capitalize">{book.title}</div>
                       <div className="text-sm text-slate-500">by {book.author}</div>
                       <div className="text-xs text-slate-500 mt-1">ISBN: {book.isbn}</div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="px-3 py-1  text-white bg-blue-600 rounded text-xs font-medium">
+                      <span className="px-3 py-1 text-white bg-blue-600 rounded text-xs font-medium">
                         {book.category}
                       </span>
                     </td>
@@ -161,7 +164,6 @@ export default function ManageBooks() {
         </div>
       </div>
 
-      {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
           <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200">
@@ -169,7 +171,7 @@ export default function ManageBooks() {
               <h2 className="text-2xl font-bold text-slate-900 dark:text-white">{editId ? 'Edit Book' : 'Add New Book'}</h2>
               <button onClick={() => setShowModal(false)} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">✕</button>
             </div>
-            
+
             <form onSubmit={handleSubmit} className="p-6 space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
@@ -209,7 +211,7 @@ export default function ManageBooks() {
 
               {formData.imageUrl && (
                 <div className="mt-4 flex justify-center">
-                   <img src={formData.imageUrl} alt="Preview" className="h-32 object-contain rounded-lg border border-slate-200 dark:border-slate-700 p-1" />
+                  <img src={formData.imageUrl} alt="Preview" className="h-32 object-contain rounded-lg border border-slate-200 dark:border-slate-700 p-1" />
                 </div>
               )}
 

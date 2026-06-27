@@ -42,7 +42,7 @@ function Signup() {
   return (
     <div className="min-h-[calc(100vh-5rem)] bg-[#FAFAFA] flex items-center justify-center p-4">
 
-<div className="relative bg-white rounded-[2rem] shadow-lg w-full max-w-sm pt-16 pb-8 px-6 sm:px-10 mt-16">
+<div className="relative bg-white rounded shadow-lg w-full max-w-sm pt-16 pb-8 px-6 sm:px-10 mt-16">
 
         <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-white rounded-full p-5 ">
           <IoPersonCircleSharp className="fa-regular fa-user text-3xl text-gray-400" />
@@ -124,7 +124,7 @@ function Signup() {
             <button
             
               type="submit"
-              className="w-full bg-[#3D4A5D] text-white py-2 font-semibold tracking-widest text-sm hover:bg-gray-700 transition-colors"
+              className="w-full bg-blue-600 text-white py-2 font-semibold tracking-widest text-sm hover:bg-blue-500 transition-colors"
             >
 
               SignUp

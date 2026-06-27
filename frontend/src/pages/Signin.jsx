@@ -60,7 +60,7 @@ function Signin() {
   return (
     <div className="min-h-[calc(100vh-5rem)] bg-[#FAFAFA] flex items-center justify-center p-4">
     
-          <div className="relative bg-white rounded-[2rem] shadow-lg w-full max-w-sm pt-10 pb-8 px-6 sm:px-10 mt-16">
+          <div className="relative bg-white rounded shadow-lg w-full max-w-sm pt-10 pb-8 px-6 sm:px-10 mt-16">
     
             <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-white rounded-full p-5 ">
               <IoPersonCircleSharp className="fa-regular fa-user text-3xl text-gray-400" />
@@ -79,7 +79,7 @@ function Signin() {
                 <input
                   type="text"
                   placeholder="Email"
-                  className="bg-transparent w-full  px-4 py-2 font-bold text-sm text-gray-700 outline-none placeholder-gray-400"
+                  className="bg-transparent w-full  px-4 py-2 font-bold text-sm text- outline-none placeholder-gray-400"
                   id='email'
                   onChange={handleChange}
                   
@@ -102,21 +102,14 @@ function Signin() {
               </div>
     
     
-              <div className="flex justify-between items-center text-[11px] text-gray-400 mb-6">
-                <label className="flex items-center cursor-pointer">
-                  <input type="checkbox" className="mr-2 accent-gray-500" /> Remember me
-                </label>
-                <a href="#" className="italic hover:text-gray-600 transition-colors">
-                  Forgot Password?
-                </a>
-              </div>
+             
     
     
               <div className="w-full flex flex-col gap-2">
                 <button
                   disabled={loading}
                   type="submit"
-                  className="w-full bg-[#3D4A5D] text-white py-2 font-semibold tracking-widest text-sm hover:bg-gray-700 transition-colors"
+                  className="w-full bg-blue-600 text-white py-2 font-semibold tracking-widest text-sm hover:bg-blue-500 transition-colors"
                 >
                   {loading ? 'Sign in ...' : 'Sign In'}
               

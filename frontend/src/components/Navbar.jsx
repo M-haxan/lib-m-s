@@ -4,19 +4,25 @@ import { signInSuccess } from '../redux/authSlice';
 import toast from 'react-hot-toast';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { FaBell, FaUserCircle, FaSearch, FaBars, FaTimes } from 'react-icons/fa';
+
+const fetchNotifications = async () => {
+  const { data } = await axios.get('/api/notifications', { withCredentials: true });
+  return data;
+};
 
 export default function Navbar() {
   const { currentUser } = useSelector(state => state.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
+  const queryClient = useQueryClient();
   
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
-  const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
     setShowProfileMenu(false);
@@ -24,31 +30,24 @@ export default function Navbar() {
     setIsMobileMenuOpen(false);
   }, [location.pathname]);
 
-  useEffect(() => {
-    if (currentUser) {
-      fetchNotifications();
-      // Optional: poll every 30s
-      const interval = setInterval(fetchNotifications, 30000);
-      return () => clearInterval(interval);
-    }
-  }, [currentUser]);
+  const { data: notifications = [] } = useQuery({
+    queryKey: ['notifications', currentUser?._id],
+    queryFn: fetchNotifications,
+    enabled: !!currentUser,
+    refetchInterval: 30000,
+    staleTime: 10000,
+  });
 
-  const fetchNotifications = async () => {
-    try {
-      const { data } = await axios.get('/api/notifications', { withCredentials: true });
-      setNotifications(data);
-    } catch (error) {
-      console.error('Failed to fetch notifications');
-    }
-  };
+  const markAllReadMutation = useMutation({
+    mutationFn: async () => axios.put('/api/notifications/read-all', {}, { withCredentials: true }),
+    onSuccess: () => {
+      queryClient.setQueryData(['notifications', currentUser?._id], (prev = []) => prev.map(n => ({ ...n, isRead: true })));
+    },
+    onError: (error) => console.error(error)
+  });
 
   const markAllRead = async () => {
-    try {
-      await axios.put('/api/notifications/read-all', {}, { withCredentials: true });
-      setNotifications(notifications.map(n => ({ ...n, isRead: true })));
-    } catch (error) {
-      console.error(error);
-    }
+    markAllReadMutation.mutate();
   };
 
   const handleLogout = async () => {
@@ -93,21 +92,6 @@ export default function Navbar() {
               </span>
             </Link>
           </div>
-
-          <form onSubmit={handleSearch} className="flex-1 max-w-lg mx-4 hidden md:flex">
-      <div className="relative w-full">
-        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <FaSearch className="text-slate-400" />
-        </div>
-        <input 
-          type="text" 
-          placeholder="Search catalog..." 
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-10 pr-4 py-2 border border-slate-400  rounded bg-[#FFFFFF]  text-sm focus:outline-none    transition-all text-slate-900"
-        />
-      </div>
-    </form>
 
           {/* Right Side Items */}
           <div className="hidden lg:flex items-center space-x-6">
