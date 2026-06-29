@@ -64,7 +64,7 @@ export const updateProfile = async (req, res, next) => {
         if (year) user.year = year;
 
         if (password) {
-            const hashPass = await UserModel.hashPassword ? await UserModel.hashPassword(password) : await import('bcrypt').then(async (b) => b.default.hash(password, 10));
+            const hashPass = await UserModel.hashPassword ? await UserModel.hashPassword(password) : await import('bcryptjs').then(async (b) => b.default.hash(password, 10));
             user.password = hashPass;
         }
 

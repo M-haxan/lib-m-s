@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken'
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcryptjs'
 import UserModel from '../models/UserModel.js'
 import { errorHandler } from '../utils/error.js';
 
@@ -44,7 +44,13 @@ export const loginUser = async (req, res, next)=>{
      }
      const token = jwt.sign({id:user._id}, process.env.JWT_SECRET, { expiresIn: '1d' });
      const {password: pass, ...rest} = user._doc;
-     res.cookie('access_token', token, {httpOnly:true}). status(200).json(rest);
+
+     const isProduction = process.env.NODE_ENV === 'production';
+     res.cookie('access_token', token, {
+         httpOnly: true,
+         secure: isProduction,
+         sameSite: isProduction ? 'none' : 'lax'
+     }).status(200).json(rest);
     }catch(error){
         next(error);
     }
@@ -52,7 +58,12 @@ export const loginUser = async (req, res, next)=>{
 
 export const logoutUser = (req, res, next) => {
     try {
-        res.clearCookie('access_token');
+        const isProduction = process.env.NODE_ENV === 'production';
+        res.clearCookie('access_token', {
+            httpOnly: true,
+            secure: isProduction,
+            sameSite: isProduction ? 'none' : 'lax'
+        });
         res.status(200).json({ message: 'User has been logged out successfully!' });
     } catch (error) {
         next(error);
