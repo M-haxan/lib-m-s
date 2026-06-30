@@ -8,6 +8,7 @@ import { IoPersonCircleSharp } from "react-icons/io5";
 import { IoPerson } from "react-icons/io5";
 import { MdEmail } from "react-icons/md";
 import { RiLockPasswordFill } from "react-icons/ri"
+import toast from 'react-hot-toast'
 
 // Lazmi: Har request k sath cookies bhejne k liye
 axios.defaults.withCredentials = true;
@@ -22,7 +23,7 @@ function Signin() {
   const [formData, setFormData] = useState({ email: '', password: '' });
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
   const loginMutation = useMutation({
@@ -35,6 +36,7 @@ function Signin() {
     onSuccess: (response) => {
       // Redux: User data save karo
       dispatch(signInSuccess(response.data)); 
+      toast.success("user loged in Successfuly");
       setLoading (false)
       // Role k mutabiq dashboard par bhejo
       if (response.data.role === 'admin') {
@@ -46,6 +48,7 @@ function Signin() {
     onError: (err) => {
       // Redux: Error save karo
       dispatch(signInFailure(err.response?.data?.message || 'Login Failed!'));
+      toast.error(error.response?.data?.message || 'login Failed!');
     }
   });
 

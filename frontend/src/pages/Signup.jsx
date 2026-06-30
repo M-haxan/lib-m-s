@@ -7,6 +7,7 @@ import { IoPerson } from "react-icons/io5";
 import { MdEmail } from "react-icons/md";
 import { RiLockPasswordFill } from "react-icons/ri"
 import { FaGraduationCap } from "react-icons/fa";
+import toast from 'react-hot-toast'
 
 function Signup() {
   const navigate = useNavigate();
@@ -26,9 +27,10 @@ function Signup() {
     onSuccess: () => {
       alert('Account Created Successfully! Please Log In.');
       navigate('/signin');
+      toast.success("user Successfully register")
     },
     onError: (error) => {
-      alert(error.response?.data?.message || 'Registration Failed!');
+      toast.error(error.response?.data?.message || 'Registration Failed!');
     }
   });
 
