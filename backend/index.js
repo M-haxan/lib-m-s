@@ -5,20 +5,28 @@ import connectDB from './config/db.js'
 import dotenv from 'dotenv'
 import cookieParser from 'cookie-parser'
 import authRouter from './routes/authroutes.js'
+import bookRouter from './routes/bookRoutes.js'
+import transactionRouter from './routes/transactionRoutes.js'
+import reservationRouter from './routes/reservationRoutes.js'
+import { startCronJobs } from './cronJobs.js'
 
 dotenv.config();
 const app = express();
 
 connectDB();
+startCronJobs();
 
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-  origin: 'http://localhost:5173', // Apne Vite frontend ka exact link dain
+  origin: 'http://localhost:5174', // Apne Vite frontend ka exact link dain
   credentials: true, // Yeh true karna lazmi hai cookies ko allow karne k liye
 }));
 
 app.use('/api/auth', authRouter);
+app.use('/api/books', bookRouter);
+app.use('/api/transactions', transactionRouter);
+app.use('/api/reservations', reservationRouter);
 const PORT = process.env.PORT || 5000;
 
   app.listen(PORT, () => {

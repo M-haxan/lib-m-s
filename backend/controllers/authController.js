@@ -42,12 +42,19 @@ export const loginUser = async (req, res, next)=>{
      if(!isMatch){
         return next(errorHandler(401, 'invalidPassword'))
      }
-     const token = jwt.sign({id:user._id}, process.env.JWT_SECRET);
+     const token = jwt.sign({id:user._id}, process.env.JWT_SECRET, { expiresIn: '1d' });
      const {password: pass, ...rest} = user._doc;
      res.cookie('access_token', token, {httpOnly:true}). status(200).json(rest);
     }catch(error){
         next(error);
     }
-    
-
 } 
+
+export const logoutUser = (req, res, next) => {
+    try {
+        res.clearCookie('access_token');
+        res.status(200).json({ message: 'User has been logged out successfully!' });
+    } catch (error) {
+        next(error);
+    }
+};
