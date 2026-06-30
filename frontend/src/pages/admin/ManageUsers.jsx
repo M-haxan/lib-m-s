@@ -11,12 +11,24 @@ const fetchUsers = async () => {
 export default function ManageUsers() {
   const queryClient = useQueryClient();
   const [selectedUser, setSelectedUser] = useState(null);
+  const [activeTab, setActiveTab] = useState('active'); // 'active' or 'pending'
 
   const { data: users = [], isLoading } = useQuery({
     queryKey: ['users'],
     queryFn: fetchUsers,
     staleTime: 30000,
     onError: () => toast.error('Failed to fetch users')
+  });
+
+  const approveUserMutation = useMutation({
+    mutationFn: async (id) => axios.put(`/api/users/${id}/approve`, {}, { withCredentials: true }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+      toast.success('Student account approved successfully');
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message || 'Failed to approve student account');
+    }
   });
 
   const deleteUserMutation = useMutation({
@@ -29,6 +41,10 @@ export default function ManageUsers() {
       toast.error(error.response?.data?.message || 'Failed to delete student account');
     }
   });
+
+  const handleApprove = (id) => {
+    approveUserMutation.mutate(id);
+  };
 
   const handleDelete = (id) => {
     toast((t) => (
@@ -56,12 +72,31 @@ export default function ManageUsers() {
   };
 
   const students = users.filter(user => user.role === 'student');
+  const activeStudents = students.filter(user => user.isApproved !== false);
+  const pendingStudents = students.filter(user => user.isApproved === false);
+  const displayedStudents = activeTab === 'active' ? activeStudents : pendingStudents;
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="bg-white p-6 rounded shadow-sm border">
         <h1 className="text-3xl font-bold text-blue-600">Registered Students</h1>
         <p className="text-slate-500 mt-1">View and manage student accounts.</p>
+      </div>
+
+      {/* Tabs */}
+      <div className="flex border-b border-slate-200 bg-white rounded shadow-sm">
+        <button
+          onClick={() => setActiveTab('active')}
+          className={`flex-1 py-3 font-bold text-sm border-b-2 text-center transition-all ${activeTab === 'active' ? 'border-blue-600 text-blue-600 bg-blue-50/20' : 'border-transparent text-slate-500 hover:text-slate-800 hover:bg-slate-50/50'}`}
+        >
+          Active Students ({activeStudents.length})
+        </button>
+        <button
+          onClick={() => setActiveTab('pending')}
+          className={`flex-1 py-3 font-bold text-sm border-b-2 text-center transition-all ${activeTab === 'pending' ? 'border-blue-600 text-blue-600 bg-blue-50/20' : 'border-transparent text-slate-500 hover:text-slate-800 hover:bg-slate-50/50'}`}
+        >
+          Pending Approvals ({pendingStudents.length})
+        </button>
       </div>
 
       <div className="bg-white rounded shadow-sm border overflow-hidden">
@@ -71,6 +106,7 @@ export default function ManageUsers() {
               <tr className="text-slate-500 text-sm uppercase">
                 <th className="px-6 py-4 font-medium">Name</th>
                 <th className="px-6 py-4 font-medium">Email</th>
+                {activeTab === 'pending' && <th className="px-6 py-4 font-medium">Email Status</th>}
                 <th className="px-6 py-4 font-medium">Role</th>
                 <th className="px-6 py-4 font-medium">Joined On</th>
                 <th className="px-6 py-4 font-medium text-right">Actions</th>
@@ -78,14 +114,21 @@ export default function ManageUsers() {
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
               {isLoading ? (
-                <tr><td colSpan="5" className="px-6 py-8 text-center text-slate-500 animate-pulse">Loading students...</td></tr>
-              ) : students.length === 0 ? (
-                <tr><td colSpan="5" className="px-6 py-8 text-center text-slate-500">No students found.</td></tr>
+                <tr><td colSpan={activeTab === 'pending' ? "6" : "5"} className="px-6 py-8 text-center text-slate-500 animate-pulse">Loading students...</td></tr>
+              ) : displayedStudents.length === 0 ? (
+                <tr><td colSpan={activeTab === 'pending' ? "6" : "5"} className="px-6 py-8 text-center text-slate-500">No students found.</td></tr>
               ) : (
-                students.map(user => (
+                displayedStudents.map(user => (
                   <tr key={user._id} className="hover:bg-slate-50 cursor-pointer transition-colors" onClick={() => setSelectedUser(user)}>
                     <td className="px-6 py-4 font-semibold text-slate-900">{user.name}</td>
                     <td className="px-6 py-4 text-slate-600 dark:text-slate-400">{user.email}</td>
+                    {activeTab === 'pending' && (
+                      <td className="px-6 py-4">
+                        <span className={`px-2.5 py-0.5 rounded text-[11px] font-bold uppercase ${user.isEmailVerified ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
+                          {user.isEmailVerified ? 'Verified' : 'Pending Verification'}
+                        </span>
+                      </td>
+                    )}
                     <td className="px-6 py-4">
                       <span className={`px-3 py-1 rounded text-xs font-bold uppercase bg-emerald-100 text-emerald-700`}>
                         {user.role}
@@ -94,10 +137,19 @@ export default function ManageUsers() {
                     <td className="px-6 py-4 text-sm text-slate-500">
                       {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
                     </td>
-                    <td className="px-6 py-4 text-right">
+                    <td className="px-6 py-4 text-right flex justify-end gap-2" onClick={(e) => e.stopPropagation()}>
+                      {activeTab === 'pending' && (
+                        <button
+                          disabled={approveUserMutation.isPending}
+                          onClick={() => handleApprove(user._id)}
+                          className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs font-bold transition-all disabled:opacity-50"
+                        >
+                          {approveUserMutation.isPending && approveUserMutation.variables === user._id ? 'Approving...' : 'Approve'}
+                        </button>
+                      )}
                       <button
                         disabled={deleteUserMutation.isPending && deleteUserMutation.variables === user._id}
-                        onClick={(e) => { e.stopPropagation(); handleDelete(user._id); }}
+                        onClick={() => handleDelete(user._id)}
                         className="text-rose-600 hover:text-rose-800 dark:hover:text-rose-400 text-sm font-medium transition-colors disabled:opacity-50"
                       >
                         {deleteUserMutation.isPending && deleteUserMutation.variables === user._id ? 'Deleting...' : 'Delete'}

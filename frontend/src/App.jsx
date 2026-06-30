@@ -17,6 +17,9 @@ import ManageUsers from './pages/admin/ManageUsers';
 import Analytics from './pages/admin/Analytics';
 import StudentDashboard from './pages/StudentDashboard';
 import Profile from './pages/Profile';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
+import VerifyEmail from './pages/VerifyEmail';
 
 function App() {
   return (
@@ -32,6 +35,9 @@ function App() {
         <Route path='/book/:id' element={<BookDetails />} />
         <Route path='/signin' element= {<Signin/>}/>
         <Route path='/signup' element= {<Signup/>}/>
+        <Route path='/forgot-password' element={<ForgotPassword />} />
+        <Route path='/reset-password/:token' element={<ResetPassword />} />
+        <Route path='/verify-email/:token' element={<VerifyEmail />} />
         
         <Route element={<PrivateRoute />}>
            <Route path='/student-dashboard' element={<StudentDashboard />} />

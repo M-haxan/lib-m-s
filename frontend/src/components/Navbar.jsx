@@ -122,7 +122,7 @@ export default function Navbar() {
                 <span className="text-white font-bold text-xl">L</span>
               </div>
               <span className="text-xl font-bold text-slate-500  hidden sm:block">
-                X-Y-Z Library
+                Library Management System
               </span>
             </Link>
           </div>
@@ -321,28 +321,29 @@ export default function Navbar() {
           <div className="flex flex-col space-y-2">
             {!currentUser && (
                <>
-                 <Link to="/" className="text-slate-900 hover:bg-blue-600 px-3 py-2  font-bold">Home</Link>
-                 <Link to="/catalog" className="text-slate-900   px-3 py-2  font-bold">Catalog</Link>
-                 <Link to="/signin" className="text-slate-900 font-bold px-3 py-2">Login</Link>
-                 <Link to="/signup" className="text-slate-900   px-3 py-2  font-bold">Register</Link>
+                 <Link to="/" className="text-slate-700 hover:bg-blue-50 hover:text-blue-600 px-3 py-2 rounded font-bold transition-all duration-200">Home</Link>
+                 <Link to="/catalog" className="text-slate-700 hover:bg-blue-50 hover:text-blue-600 px-3 py-2 rounded font-bold transition-all duration-200">Catalog</Link>
+                 <Link to="/signin" className="text-slate-700 hover:bg-blue-50 hover:text-blue-600 px-3 py-2 rounded font-bold transition-all duration-200">Login</Link>
+                 <Link to="/signup" className="text-slate-700 hover:bg-blue-50 hover:text-blue-600 px-3 py-2 rounded font-bold transition-all duration-200">Register</Link>
                </>
             )}
             {currentUser?.role === 'student' && (
                <>
-                 <Link to="/" className="text-slate-600  px-3 py-2  font-bold">Home</Link>
-                 <Link to="/catalog" className="text-slate-600  px-3 py-2  font-bold">Catalog</Link>
-                 <Link to="/student-dashboard" className="text-slate-600  hover:text-blue-600 px-3 py-2  font-bold">Dashboard</Link>
-                 <Link to="/profile" className="text-slate-600  hover:text-blue-600 px-3 py-2  font-bold">My Profile</Link>
-                 <button onClick={handleLogout} className="text-left text-rose-600 hover:bg-rose-50 px-3 py-2 rounded-lg font-medium">Logout</button>
+                 <Link to="/" className="text-slate-700 hover:bg-blue-50 hover:text-blue-600 px-3 py-2 rounded font-bold transition-all duration-200">Home</Link>
+                 <Link to="/catalog" className="text-slate-700 hover:bg-blue-50 hover:text-blue-600 px-3 py-2 rounded font-bold transition-all duration-200">Catalog</Link>
+                 <Link to="/student-dashboard" className="text-slate-700 hover:bg-blue-50 hover:text-blue-600 px-3 py-2 rounded font-bold transition-all duration-200">Dashboard</Link>
+                 <Link to="/profile" className="text-slate-700 hover:bg-blue-50 hover:text-blue-600 px-3 py-2 rounded font-bold transition-all duration-200">My Profile</Link>
+                 <button onClick={handleLogout} className="text-left text-rose-600 hover:bg-rose-50 px-3 py-2 rounded font-bold transition-all duration-200 cursor-pointer">Logout</button>
                </>
             )}
             {currentUser?.role === 'admin' && (
                <>
-                 <Link to="/admin-dashboard" className="text-slate-900   px-3 py-2  font-bold">Dashboard</Link>
-                 <Link to="/admin-dashboard/manage-books" className="text-slate-900  px-3 py-2  font-bold">Books</Link>
-                 <Link to="/admin-dashboard/transactions" className="text-slate-900   px-3 py-2 rounded-lg font-bold">Circulation</Link>
-                 <Link to="/profile" className="text-slate-900  hover:text-blue-600 px-3 py-2  font-bold">My Profile</Link>
-                 <button onClick={handleLogout} className="text-left text-rose-600  px-3 py-2 rounded-lg font-medium">Logout</button>
+                 <Link to="/admin-dashboard" className="text-slate-700 hover:bg-blue-50 hover:text-blue-600 px-3 py-2 rounded font-bold transition-all duration-200">Dashboard</Link>
+                 <Link to="/admin-dashboard/manage-books" className="text-slate-700 hover:bg-blue-50 hover:text-blue-600 px-3 py-2 rounded font-bold transition-all duration-200">Books</Link>
+                 <Link to="/admin-dashboard/transactions" className="text-slate-700 hover:bg-blue-50 hover:text-blue-600 px-3 py-2 rounded font-bold transition-all duration-200">Circulation</Link>
+                 <Link to="/admin-dashboard/manage-users" className="text-slate-700 hover:bg-blue-50 hover:text-blue-600 px-3 py-2 rounded font-bold transition-all duration-200">Users</Link>
+                 <Link to="/profile" className="text-slate-700 hover:bg-blue-50 hover:text-blue-600 px-3 py-2 rounded font-bold transition-all duration-200">My Profile</Link>
+                 <button onClick={handleLogout} className="text-left text-rose-600 hover:bg-rose-50 px-3 py-2 rounded font-bold transition-all duration-200 cursor-pointer">Logout</button>
                </>
             )}
           </div>
