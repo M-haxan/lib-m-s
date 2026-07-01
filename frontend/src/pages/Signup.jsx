@@ -175,26 +175,26 @@ function Signup() {
                 <div className="absolute z-20 left-0 right-0 top-full mt-1 bg-white p-3 rounded shadow-xl border border-slate-200 text-[11px] space-y-1.5 animate-in fade-in slide-in-from-top-1 duration-200">
                   <p className="font-bold text-slate-500 mb-0.5">Password Requirements:</p>
                   <div className="flex items-center gap-2">
-                    <span className={`w-2 h-2 rounded-full transition-colors duration-300 ${passwordValidations.hasLength ? 'bg-emerald-500' : 'bg-slate-300'}`} />
-                    <span className={passwordValidations.hasLength ? 'text-emerald-700 font-semibold' : 'text-slate-500'}>
+                    <span className={`w-2 h-2 rounded-full transition-colors duration-300 ${passwordValidations.hasLength ? 'bg-emerald-500' : 'bg-red-500'}`} />
+                    <span className={passwordValidations.hasLength ? 'text-emerald-700 font-semibold' : 'text-red-500'}>
                       At least 8 characters
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className={`w-2 h-2 rounded-full transition-colors duration-300 ${passwordValidations.hasUpper ? 'bg-emerald-500' : 'bg-slate-300'}`} />
-                    <span className={passwordValidations.hasUpper ? 'text-emerald-700 font-semibold' : 'text-slate-500'}>
+                    <span className={`w-2 h-2 rounded-full transition-colors duration-300 ${passwordValidations.hasUpper ? 'bg-emerald-500' : 'bg-red-500'}`} />
+                    <span className={passwordValidations.hasUpper ? 'text-emerald-700 font-semibold' : 'text-red-500'}>
                       At least one uppercase letter (A-Z)
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className={`w-2 h-2 rounded-full transition-colors duration-300 ${passwordValidations.hasNumber ? 'bg-emerald-500' : 'bg-slate-300'}`} />
-                    <span className={passwordValidations.hasNumber ? 'text-emerald-700 font-semibold' : 'text-slate-500'}>
+                    <span className={`w-2 h-2 rounded-full transition-colors duration-300 ${passwordValidations.hasNumber ? 'bg-emerald-500' : 'bg-red-500'}`} />
+                    <span className={passwordValidations.hasNumber ? 'text-emerald-700 font-semibold' : 'text-red-500'}>
                       At least one number (0-9)
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className={`w-2 h-2 rounded-full transition-colors duration-300 ${passwordValidations.hasSpecial ? 'bg-emerald-500' : 'bg-slate-300'}`} />
-                    <span className={passwordValidations.hasSpecial ? 'text-emerald-700 font-semibold' : 'text-slate-500'}>
+                    <span className={`w-2 h-2 rounded-full transition-colors duration-300 ${passwordValidations.hasSpecial ? 'bg-emerald-500' : 'bg-red-500'}`} />
+                    <span className={passwordValidations.hasSpecial ? 'text-emerald-700 font-semibold' : 'text-red-500'}>
                       At least one special character (!@#$%^&*)
                     </span>
                   </div>

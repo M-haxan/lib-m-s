@@ -92,16 +92,16 @@ export default function Catalog() {
         {currentUser && recommendedBooks.length > 0 && (
           <div className="space-y-4">
             <div className="flex items-center space-x-2 border-b border-slate-200 pb-3">
-              <FaThumbsUp className="text-blue-600 text-xl" />
-              <h2 className="text-2xl font-bold text-slate-800">Recommended For You</h2>
-              <span className="text-[11px] font-bold uppercase tracking-wider bg-blue-100 text-blue-800 px-2 py-0.5 rounded">Interests</span>
+              <FaThumbsUp className="text-blue-600 text-md" />
+              <h2 className="text-sm sm:text-2xl font-bold text-slate-800">Recommended For Your preference</h2>
+              <span className="text-[11px] font-bold uppercase tracking-wider bg-blue-100 text-blue-800 px-2 py-1 rounded">Interests</span>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
               {recommendedBooks.map(book => (
                 <Link
                   to={`/book/${book._id}`}
                   key={`rec-${book._id}`}
-                  className="group flex flex-col bg-white rounded p-3 shadow-sm hover:shadow-xl border hover:border-blue-200 transition-all duration-300 hover:-translate-y-1"
+                  className="group flex flex-col bg-white rounded p-3 shadow-sm hover:shadow-xl  transition-all duration-300 hover:-translate-y-1"
                 >
                   <div className="relative w-full aspect-[4/5] rounded overflow-hidden mb-3 shadow-inner">
                     <img src={book.imageUrl || 'https://via.placeholder.com/150'} alt={book.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
@@ -142,7 +142,7 @@ export default function Catalog() {
                 <Link
                   to={`/book/${book._id}`}
                   key={`most-${book._id}`}
-                  className="group flex flex-col bg-white rounded p-3 shadow-sm hover:shadow-xl border hover:border-orange-200 transition-all duration-300 hover:-translate-y-1"
+                  className="group flex flex-col bg-white rounded p-3 shadow-sm hover:shadow-xl  transition-all duration-300 hover:-translate-y-1"
                 >
                   <div className="relative w-full aspect-[4/5] rounded overflow-hidden mb-3 shadow-inner">
                     <img src={book.imageUrl || 'https://via.placeholder.com/150'} alt={book.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
@@ -153,7 +153,7 @@ export default function Catalog() {
                     )}
                   </div>
                   <div className="flex flex-col flex-grow">
-                    <h3 className="font-semibold text-slate-800 capitalize group-hover:text-orange-500 transition-colors line-clamp-1">{book.title}</h3>
+                    <h3 className="font-semibold text-slate-800 capitalize group-hover:text-blue-500 transition-colors line-clamp-1">{book.title}</h3>
                     <p className="text-xs text-slate-500 capitalize line-clamp-1">{book.author}</p>
                     <div className="mt-auto pt-3 flex justify-between items-center">
                       <span className="text-[10px] font-bold uppercase px-2 py-0.5 bg-slate-100 text-slate-600 rounded">
@@ -172,12 +172,12 @@ export default function Catalog() {
 
         {/* 3. General Book List Section */}
         <div className="space-y-6">
-          <div className="border-b border-slate-200 pb-3">
+          <div className=" pb-3">
             <h2 className="text-2xl font-bold text-slate-800">All Books Catalog</h2>
           </div>
 
           {/* Filters card */}
-          <div className="bg-white p-6 rounded shadow-xl border border-slate-100">
+          <div className="bg-white p-6 rounded shadow-xl ">
             <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
               <div className="md:col-span-5 relative">
                 <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-slate-400">
@@ -189,7 +189,7 @@ export default function Catalog() {
                   value={filters.search}
                   onChange={handleFilterChange}
                   placeholder="Search by title or author..."
-                  className="w-full pl-12 pr-4 py-4 bg-[#F8F9FA] border rounded text-slate-500 outline-none transition-all focus:border-blue-500 focus:bg-white"
+                  className="w-full pl-12 pr-4 py-4 bg-[#F8F9FA] border rounded text-slate-500 outline-none transition-all focus:border-blue-500 "
                 />
               </div>
 
@@ -234,7 +234,7 @@ export default function Catalog() {
           {isLoading && books.length === 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
               {[1, 2, 3, 4, 5].map(n => (
-                <div key={n} className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 animate-pulse">
+                <div key={n} className="bg-white rounded-2xl p-4 shadow-sm  animate-pulse">
                   <div className="w-full aspect-[2/3] bg-slate-200 rounded-xl mb-4"></div>
                   <div className="h-4 bg-slate-200 rounded w-3/4 mb-2"></div>
                   <div className="h-3 bg-slate-200 rounded w-1/2"></div>
@@ -242,7 +242,7 @@ export default function Catalog() {
               ))}
             </div>
           ) : books.length === 0 ? (
-            <div className="text-center py-20 bg-white rounded border border-slate-150">
+            <div className="text-center py-20 bg-white rounded ">
               <h3 className="text-2xl font-semibold text-slate-700">No books found</h3>
               <p className="text-slate-500 mt-2">Try adjusting your search or filters.</p>
             </div>
@@ -252,7 +252,7 @@ export default function Catalog() {
                 <Link
                   to={`/book/${book._id}`}
                   key={book._id}
-                  className="group flex flex-col bg-white rounded p-3 shadow-sm hover:shadow-xl border hover:border-blue-200 transition-all duration-300 hover:-translate-y-1"
+                  className="group flex flex-col bg-white rounded p-3 shadow-sm hover:shadow-xl  hover:border-blue-200 transition-all duration-300 hover:-translate-y-1"
                 >
                   <div className="relative w-full aspect-[4/5] rounded overflow-hidden mb-3 shadow-inner">
                     <img src={book.imageUrl || 'https://via.placeholder.com/150'} alt={book.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
