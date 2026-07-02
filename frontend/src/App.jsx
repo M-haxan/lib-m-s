@@ -20,6 +20,9 @@ import Profile from './pages/Profile';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import VerifyEmail from './pages/VerifyEmail';
+import About from './pages/About';
+import FAQ from './pages/FAQ';
+import Contact from './pages/Contact';
 
 function App() {
   return (
@@ -38,6 +41,9 @@ function App() {
         <Route path='/forgot-password' element={<ForgotPassword />} />
         <Route path='/reset-password/:token' element={<ResetPassword />} />
         <Route path='/verify-email/:token' element={<VerifyEmail />} />
+        <Route path='/about' element={<About />} />
+        <Route path='/faq' element={<FAQ />} />
+        <Route path='/contact' element={<Contact />} />
         
         <Route element={<PrivateRoute />}>
            <Route path='/student-dashboard' element={<StudentDashboard />} />

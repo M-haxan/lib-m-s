@@ -13,9 +13,9 @@ export default function Footer() {
 
         {/* Links */}
         <div className="flex space-x-6 text-sm font-medium text-slate-500 dark:text-slate-500">
-          <Link to="#" className="hover:text-blue-600 transition-colors">About</Link>
-          <Link to="#" className="hover:text-blue-600 transition-colors">Help/FAQ</Link>
-          <Link to="#" className="hover:text-blue-600 transition-colors">Contact Admin</Link>
+          <Link to="/about" className="hover:text-blue-600 transition-colors">About</Link>
+          <Link to="/faq" className="hover:text-blue-600 transition-colors">Help/FAQ</Link>
+          <Link to="/contact" className="hover:text-blue-600 transition-colors">Contact Admin</Link>
         </div>
 
         {/* Social Icons */}

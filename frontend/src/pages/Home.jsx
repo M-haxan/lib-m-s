@@ -8,8 +8,8 @@ export default function Home() {
       {/* Hero Section */}
       <div className="max-w-7xl mx-auto px-6 py-20 flex flex-col lg:flex-row items-center gap-12">
         <div className="lg:w-1/2 space-y-8 text-center lg:text-left">
-          <div className="inline-block px-4 py-2 rounded-full bg-blue-100  text-blue-700  font-semibold text-sm tracking-wide">
-            Next Generation Library Management
+          <div className="inline-block px-4 py-2 rounded bg-blue-100  text-blue-700  font-semibold text-sm tracking-wide">
+             Library Management
           </div>
           
           <h1 className="text-3xl text-[#0F172B] md:text-6xl font-abold tracking-tight leading-tight">
@@ -23,7 +23,7 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
             <Link 
               to="/catalog" 
-              className="flex items-center gap-2 px-8 py-4 bg-blue-600 hover:bg-blue-500  text-white rounded-2xl font-bold text-lg shadow-xl shadow-blue-500/30 hover:-translate-y-1 transition-all duration-300 w-full sm:w-auto justify-center"
+              className="flex items-center gap-2 px-8 py-4 bg-blue-600 hover:bg-blue-500  text-white rounded font-bold text-lg shadow-xl shadow-blue-500/30 hover:-translate-y-1 transition-all duration-300 w-full sm:w-auto justify-center"
             >
               Browse Catalog <FaArrowRight />
             </Link>
@@ -31,11 +31,11 @@ export default function Home() {
         </div>
 
         <div className="lg:w-1/2 w-full relative">
-          <div className="absolute inset-0 bg-gradient-to-tr from-blue-100 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-[3rem] transform rotate-3 scale-105 -z-10"></div>
+          <div className="absolute inset-0 bg-gradient-to-tr from-blue-100 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded transform scale-105 -z-10"></div>
           <img 
             src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" 
             alt="Library Books" 
-            className="rounded-[3rem] shadow-2xl object-cover aspect-video sm:aspect-[4/3] w-full"
+            className="rounded shadow-2xl object-cover aspect-video sm:aspect-[4/3] w-full"
           />
         </div>
       </div>
