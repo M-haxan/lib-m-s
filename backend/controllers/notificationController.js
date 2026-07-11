@@ -7,8 +7,7 @@ import { errorHandler } from '../utils/error.js';
 export const getMyNotifications = async (req, res, next) => {
     try {
         const notifications = await NotificationModel.find({ user: req.user.id })
-            .sort({ createdAt: -1 })
-            .limit(20);
+            .sort({ createdAt: -1 });
         res.status(200).json(notifications);
     } catch (error) {
         next(error);
@@ -46,3 +45,30 @@ export const markAllAsRead = async (req, res, next) => {
         next(error);
     }
 };
+
+// @desc    Delete a single notification
+// @route   DELETE /api/notifications/:id
+// @access  Private
+export const deleteNotification = async (req, res, next) => {
+    try {
+        const notification = await NotificationModel.findOneAndDelete({ _id: req.params.id, user: req.user.id });
+        if (!notification) return next(errorHandler(404, 'Notification not found'));
+
+        res.status(200).json({ message: 'Notification deleted successfully' });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// @desc    Delete all notifications for the user
+// @route   DELETE /api/notifications/clear-all
+// @access  Private
+export const clearAllNotifications = async (req, res, next) => {
+    try {
+        await NotificationModel.deleteMany({ user: req.user.id });
+        res.status(200).json({ message: 'All notifications cleared successfully' });
+    } catch (error) {
+        next(error);
+    }
+};
+

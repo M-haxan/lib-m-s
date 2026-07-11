@@ -70,7 +70,21 @@ export const cancelReservation = async (req, res, next) => {
 export const getReservations = async (req, res, next) => {
     try {
         const reservations = await ReservationModel.find().populate('book').populate('user', '-password').sort({ createdAt: -1 });
-        res.status(200).json(reservations);
+        
+        const reservationsWithQueue = await Promise.all(reservations.map(async (resObj) => {
+            const resJson = resObj.toObject();
+            if (resJson.status === 'Pending') {
+                const queuePosition = await ReservationModel.countDocuments({
+                    book: resJson.book._id || resJson.book,
+                    status: 'Pending',
+                    createdAt: { $lte: resObj.createdAt }
+                });
+                resJson.queuePosition = queuePosition;
+            }
+            return resJson;
+        }));
+
+        res.status(200).json(reservationsWithQueue);
     } catch (error) {
         next(error);
     }
@@ -82,7 +96,21 @@ export const getReservations = async (req, res, next) => {
 export const getMyReservations = async (req, res, next) => {
     try {
         const reservations = await ReservationModel.find({ user: req.user.id }).populate('book').sort({ createdAt: -1 });
-        res.status(200).json(reservations);
+        
+        const reservationsWithQueue = await Promise.all(reservations.map(async (resObj) => {
+            const resJson = resObj.toObject();
+            if (resJson.status === 'Pending') {
+                const queuePosition = await ReservationModel.countDocuments({
+                    book: resJson.book._id || resJson.book,
+                    status: 'Pending',
+                    createdAt: { $lte: resObj.createdAt }
+                });
+                resJson.queuePosition = queuePosition;
+            }
+            return resJson;
+        }));
+
+        res.status(200).json(reservationsWithQueue);
     } catch (error) {
         next(error);
     }

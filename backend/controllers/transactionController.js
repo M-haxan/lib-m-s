@@ -2,8 +2,10 @@ import TransactionModel from '../models/TransactionModel.js';
 import BookModel from '../models/BookModel.js';
 import UserModel from '../models/UserModel.js';
 import NotificationModel from '../models/NotificationModel.js';
+import ReservationModel from '../models/ReservationModel.js';
 import { errorHandler } from '../utils/error.js';
 import nodemailer from 'nodemailer';
+import { sendEmail } from '../utils/sendEmail.js';
 
 // Configure Nodemailer
 const transporter = nodemailer.createTransport({
@@ -219,6 +221,35 @@ export const approveReturn = async (req, res, next) => {
         if (book) {
             book.availableCopies += 1;
             await book.save();
+
+            const pendingReservations = await ReservationModel.find({ book: book._id, status: 'Pending' })
+                .sort({ createdAt: 1 })
+                .populate('user');
+
+            let remainingCopies = book.availableCopies;
+            for (const reservation of pendingReservations) {
+                if (remainingCopies <= 0) break;
+
+                reservation.status = 'Fulfilled';
+                await reservation.save();
+
+                const reservationMessage = `A copy of "${book.title}" is now available for pickup.`;
+                await NotificationModel.create({
+                    user: reservation.user._id,
+                    message: reservationMessage,
+                    type: 'alert'
+                });
+
+                if (reservation.user?.email) {
+                    await sendEmail(
+                        reservation.user.email,
+                        'Reserved Book Available',
+                        `<p>Dear ${reservation.user.name},</p><p>${reservationMessage}</p><p>Please collect it from the library desk.</p>`
+                    );
+                }
+
+                remainingCopies -= 1;
+            }
         }
 
         // Notify Student

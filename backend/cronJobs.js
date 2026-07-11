@@ -1,7 +1,7 @@
 import cron from 'node-cron';
 import TransactionModel from './models/TransactionModel.js';
 import ReservationModel from './models/ReservationModel.js';
-import BookModel from './models/BookModel.js';
+import NotificationModel from './models/NotificationModel.js';
 import { sendEmail } from './utils/sendEmail.js';
 
 export const startCronJobs = () => {
@@ -23,12 +23,19 @@ export const startCronJobs = () => {
                     txn.fineAmount = diffDays * 1; // e.g., $1 per day
                     await txn.save();
 
-                    // Send email
+                    const overdueMessage = `Your book "${txn.book.title}" is overdue by ${diffDays} day(s). Please return it to avoid further fines.`;
+
+                    await NotificationModel.create({
+                        user: txn.user._id,
+                        message: overdueMessage,
+                        type: 'alert'
+                    });
+
                     if (txn.user.email) {
                        await sendEmail(
                            txn.user.email,
                            'Overdue Book Notice',
-                           `<p>Dear ${txn.user.name},</p><p>Your book "<b>${txn.book.title}</b>" is overdue by ${diffDays} days. Please return it to avoid further fines.</p>`
+                           `<p>Dear ${txn.user.name},</p><p>${overdueMessage}</p>`
                        );
                     }
                 } else {
@@ -37,11 +44,19 @@ export const startCronJobs = () => {
                     const diffDaysBefore = Math.ceil(diffTimeBefore / (1000 * 60 * 60 * 24));
                     
                     if (diffDaysBefore === 3) {
+                         const reminderMessage = `This is a reminder that your book "${txn.book.title}" is due in 3 days. Please return it on time.`;
+
+                         await NotificationModel.create({
+                             user: txn.user._id,
+                             message: reminderMessage,
+                             type: 'alert'
+                         });
+
                          if (txn.user.email) {
                             await sendEmail(
                                 txn.user.email,
                                 'Book Return Reminder',
-                                `<p>Dear ${txn.user.name},</p><p>This is a reminder that your book "<b>${txn.book.title}</b>" is due in 3 days. Please return it on time.</p>`
+                                `<p>Dear ${txn.user.name},</p><p>${reminderMessage}</p>`
                             );
                          }
                     }
