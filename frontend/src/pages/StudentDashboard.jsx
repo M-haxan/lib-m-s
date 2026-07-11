@@ -9,6 +9,11 @@ const fetchUserTransactions = async () => {
   return res.data;
 };
 
+const fetchUserReservations = async () => {
+  const res = await axios.get('/api/reservations/my-reservations', { withCredentials: true });
+  return res.data;
+};
+
 export default function StudentDashboard() {
   const { currentUser } = useSelector(state => state.user);
   const queryClient = useQueryClient();
@@ -18,6 +23,31 @@ export default function StudentDashboard() {
     queryFn: fetchUserTransactions,
     staleTime: 30000,
   });
+
+  const { data: reservations = [], isLoading: reservationsLoading } = useQuery({
+    queryKey: ['student-reservations'],
+    queryFn: fetchUserReservations,
+    staleTime: 30000,
+  });
+
+  const cancelReservationMutation = useMutation({
+    mutationFn: async (reservationId) => {
+      await axios.post('/api/reservations/cancel', { reservationId }, { withCredentials: true });
+    },
+    onSuccess: () => {
+      toast.success('Reservation cancelled successfully!');
+      queryClient.invalidateQueries({ queryKey: ['student-reservations'] });
+      queryClient.invalidateQueries({ queryKey: ['my-reservations'] });
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message || 'Failed to cancel reservation');
+    }
+  });
+
+  const handleCancelReservation = async (reservationId) => {
+    if (!window.confirm('Are you sure you want to cancel this reservation?')) return;
+    cancelReservationMutation.mutate(reservationId);
+  };
 
   const requestReturnMutation = useMutation({
     mutationFn: async (transactionId) => {
@@ -137,6 +167,59 @@ export default function StudentDashboard() {
                       </td>
                       <td className="p-3">
                         <span className="px-2 py-1 bg-slate-500 text-slate-100 text-xs font-bold rounded">Waiting for Approval</span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+
+          <div className="bg-white p-6 rounded shadow-sm border overflow-x-auto">
+            <h2 className="text-xl text-[#0F172B] font-bold mb-4">My Book Reservations</h2>
+            {reservationsLoading ? <p>Loading...</p> : reservations.length === 0 ? (
+              <p className="text-slate-500">You have no reservations.</p>
+            ) : (
+              <table className="w-full text-left border-collapse min-w-max">
+                <thead className='bg-slate-100'>
+                  <tr className="border text-slate-500">
+                    <th className="p-3 font-medium">Book</th>
+                    <th className="p-3 font-medium">Reservation Date</th>
+                    <th className="p-3 font-medium">Status</th>
+                    <th className="p-3 font-medium">Queue Position</th>
+                    <th className="p-3 font-medium text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {reservations.map(r => (
+                    <tr key={r._id} className="text-slate-900 border-b border-slate-100">
+                      <td className="p-3">
+                        <Link to={`/book/${r.book?._id}`} className="font-bold hover:text-blue-600">
+                          {r.book?.title || 'Unknown Book'}
+                        </Link>
+                      </td>
+                      <td className="p-3">{new Date(r.reservationDate).toLocaleDateString()}</td>
+                      <td className="p-3">
+                        <span className={`px-2 py-1 text-xs font-bold rounded ${
+                          r.status === 'Pending' ? 'bg-indigo-100 text-indigo-700' :
+                          r.status === 'Fulfilled' ? 'bg-emerald-100 text-emerald-700' :
+                          'bg-rose-100 text-rose-700'
+                        }`}>
+                          {r.status}
+                        </span>
+                      </td>
+                      <td className="p-3 font-semibold text-slate-600">
+                        {r.status === 'Pending' ? r.queuePosition || 1 : '-'}
+                      </td>
+                      <td className="p-3 text-right">
+                        {r.status === 'Pending' && (
+                          <button
+                            onClick={() => handleCancelReservation(r._id)}
+                            className="px-4 py-2 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded text-sm font-semibold transition-colors"
+                          >
+                            Cancel Reservation
+                          </button>
+                        )}
                       </td>
                     </tr>
                   ))}

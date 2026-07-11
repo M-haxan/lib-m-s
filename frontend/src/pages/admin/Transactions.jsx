@@ -13,6 +13,11 @@ const fetchTransactions = async () => {
   return data.filter(t => !['Pending_Issue', 'Pending_Return'].includes(t.status));
 };
 
+const fetchReservations = async () => {
+  const { data } = await axios.get('/api/reservations', { withCredentials: true });
+  return data;
+};
+
 export default function Transactions() {
   const [activeTab, setActiveTab] = useState('requests');
   const queryClient = useQueryClient();
@@ -29,6 +34,13 @@ export default function Transactions() {
     queryFn: fetchTransactions,
     staleTime: 30000,
     enabled: activeTab === 'all',
+  });
+
+  const { data: reservations = [], isLoading: reservationsLoading } = useQuery({
+    queryKey: ['admin-reservations'],
+    queryFn: fetchReservations,
+    staleTime: 30000,
+    enabled: activeTab === 'reservations',
   });
 
   const approveIssueMutation = useMutation({
@@ -67,12 +79,26 @@ export default function Transactions() {
     onError: (error) => toast.error(error.response?.data?.message || 'Failed to collect fine')
   });
 
+  const cancelReservationMutation = useMutation({
+    mutationFn: async (reservationId) => axios.post('/api/reservations/cancel', { reservationId }, { withCredentials: true }),
+    onSuccess: () => {
+      toast.success('Reservation cancelled successfully');
+      queryClient.invalidateQueries({ queryKey: ['admin-reservations'] });
+    },
+    onError: (error) => toast.error(error.response?.data?.message || 'Failed to cancel reservation')
+  });
+
   const handleApproveIssue = (transactionId) => approveIssueMutation.mutate(transactionId);
   const handleRejectIssue = (transactionId) => rejectIssueMutation.mutate(transactionId);
   const handleApproveReturn = (transactionId) => approveReturnMutation.mutate(transactionId);
   const handleCollectFine = (transactionId) => collectFineMutation.mutate(transactionId);
+  const handleCancelReservation = (reservationId) => {
+    if (window.confirm('Are you sure you want to cancel this reservation?')) {
+      cancelReservationMutation.mutate(reservationId);
+    }
+  };
 
-  const loading = activeTab === 'requests' ? requestsLoading : transactionsLoading;
+  const loading = activeTab === 'requests' ? requestsLoading : activeTab === 'all' ? transactionsLoading : reservationsLoading;
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -86,7 +112,7 @@ export default function Transactions() {
       <div className="flex space-x-4 mb-6">
         <button
           onClick={() => setActiveTab('requests')}
-          className={`px-6 py-3 rounded hover:bg-blue-400 font-semibold transition-all ${activeTab === 'requests' ? 'bg-blue-600 text-white shadow-md' : 'bg-blue-600 text-white shadow-md'}`}
+          className={`px-6 py-3 rounded hover:bg-blue-400 font-semibold transition-all ${activeTab === 'requests' ? 'bg-blue-600 text-white shadow-md' : 'bg-blue-600 text-white shadow-md border'}`}
         >
           Pending Requests ({activeTab === 'requests' && !loading ? requests.length : '...'})
         </button>
@@ -95,6 +121,12 @@ export default function Transactions() {
           className={`px-6 py-3 hover:bg-blue-400 rounded font-semibold transition-all ${activeTab === 'all' ? 'bg-blue-600 text-white shadow-md' : 'bg-blue-600 text-white shadow-md border'}`}
         >
           All Transactions & Fines
+        </button>
+        <button
+          onClick={() => setActiveTab('reservations')}
+          className={`px-6 py-3 hover:bg-blue-400 rounded font-semibold transition-all ${activeTab === 'reservations' ? 'bg-blue-600 text-white shadow-md' : 'bg-blue-600 text-white shadow-md border'}`}
+        >
+          Reservation Queue ({activeTab === 'reservations' && !loading ? reservations.length : '...'})
         </button>
       </div>
 
@@ -117,8 +149,10 @@ export default function Transactions() {
                 <tr><td colSpan="5" className="px-6 py-8 text-center text-slate-500">No pending requests found.</td></tr>
               ) : activeTab === 'all' && transactions.length === 0 ? (
                 <tr><td colSpan="5" className="px-6 py-8 text-center text-slate-500">No transactions found.</td></tr>
+              ) : activeTab === 'reservations' && reservations.length === 0 ? (
+                <tr><td colSpan="5" className="px-6 py-8 text-center text-slate-500">No reservations found.</td></tr>
               ) : (
-                (activeTab === 'requests' ? requests : transactions).map((txn) => (
+                (activeTab === 'requests' ? requests : activeTab === 'all' ? transactions : reservations).map((txn) => (
                   <tr key={txn._id} className="hover:bg-slate-100 transition-colors">
                     <td className="px-6 py-4">
                       <div className="font-semibold text-slate-900 capitalize">{txn.book?.title || 'Unknown Book'}</div>
@@ -128,41 +162,76 @@ export default function Transactions() {
                       <div className="text-xs text-slate-500">{txn.user?.email || txn.user?._id}</div>
                     </td>
                     <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">
-                      <div><span className="font-medium">From:</span> {new Date(txn.issueDate).toLocaleDateString()}</div>
-                      <div><span className="font-medium">To:</span> {new Date(txn.dueDate).toLocaleDateString()}</div>
+                      {activeTab === 'reservations' ? (
+                        <div><span className="font-medium">Reserved:</span> {new Date(txn.reservationDate).toLocaleDateString()}</div>
+                      ) : (
+                        <>
+                          <div><span className="font-medium">From:</span> {new Date(txn.issueDate).toLocaleDateString()}</div>
+                          <div><span className="font-medium">To:</span> {new Date(txn.dueDate).toLocaleDateString()}</div>
+                        </>
+                      )}
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`px-3 py-1 rounded text-xs font-bold
-                        ${txn.status === 'Pending_Issue' ? 'bg-indigo-100 text-indigo-700' : ''}
-                        ${txn.status === 'Pending_Return' ? 'bg-amber-100 text-amber-700' : ''}
-                        ${txn.status === 'Issued' ? 'bg-blue-100 text-blue-700' : ''}
-                        ${txn.status === 'Returned' ? 'bg-emerald-100 text-emerald-700' : ''}
-                        ${txn.status === 'Rejected' ? 'bg-rose-100 text-rose-700' : ''}
-                      `}>
-                        {txn.status.replace('_', ' ')}
-                      </span>
-                      {txn.fineAmount > 0 && (
-                        <div className={`mt-2 text-xs font-bold ${txn.finePaid ? 'text-emerald-500' : 'text-rose-600'}`}>
-                          Fine: PKR {txn.fineAmount} ({txn.finePaid ? 'Paid' : 'Unpaid'})
-                        </div>
+                      {activeTab === 'reservations' ? (
+                        <>
+                          <span className={`px-3 py-1 rounded text-xs font-bold
+                            ${txn.status === 'Pending' ? 'bg-indigo-100 text-indigo-700' : ''}
+                            ${txn.status === 'Fulfilled' ? 'bg-emerald-100 text-emerald-700' : ''}
+                            ${txn.status === 'Cancelled' ? 'bg-rose-100 text-rose-700' : ''}
+                          `}>
+                            {txn.status}
+                          </span>
+                          {txn.status === 'Pending' && (
+                            <div className="mt-2 text-xs font-bold text-slate-500">
+                              Queue Position: {txn.queuePosition || 1}
+                            </div>
+                          )}
+                        </>
+                      ) : (
+                        <>
+                          <span className={`px-3 py-1 rounded text-xs font-bold
+                            ${txn.status === 'Pending_Issue' ? 'bg-indigo-100 text-indigo-700' : ''}
+                            ${txn.status === 'Pending_Return' ? 'bg-amber-100 text-amber-700' : ''}
+                            ${txn.status === 'Issued' ? 'bg-blue-100 text-blue-700' : ''}
+                            ${txn.status === 'Returned' ? 'bg-emerald-100 text-emerald-700' : ''}
+                            ${txn.status === 'Rejected' ? 'bg-rose-100 text-rose-700' : ''}
+                          `}>
+                            {txn.status.replace('_', ' ')}
+                          </span>
+                          {txn.fineAmount > 0 && (
+                            <div className={`mt-2 text-xs font-bold ${txn.finePaid ? 'text-emerald-500' : 'text-rose-600'}`}>
+                              Fine: PKR {txn.fineAmount} ({txn.finePaid ? 'Paid' : 'Unpaid'})
+                            </div>
+                          )}
+                        </>
                       )}
                     </td>
                     <td className="px-6 py-4 text-right space-x-2">
-                      {txn.status === 'Pending_Issue' && (
+                      {activeTab === 'reservations' ? (
+                        txn.status === 'Pending' && (
+                          <button onClick={() => handleCancelReservation(txn._id)} className="px-3 py-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded text-sm font-semibold transition-colors">
+                            Cancel
+                          </button>
+                        )
+                      ) : (
                         <>
-                          <button onClick={() => handleApproveIssue(txn._id)} className="px-3 py-1.5 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 rounded text-sm font-semibold transition-colors">Approve</button>
-                          <button onClick={() => handleRejectIssue(txn._id)} className="px-3 py-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded text-sm font-semibold transition-colors">Reject</button>
+                          {txn.status === 'Pending_Issue' && (
+                            <>
+                              <button onClick={() => handleApproveIssue(txn._id)} className="px-3 py-1.5 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 rounded text-sm font-semibold transition-colors">Approve</button>
+                              <button onClick={() => handleRejectIssue(txn._id)} className="px-3 py-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded text-sm font-semibold transition-colors">Reject</button>
+                            </>
+                          )}
+                          {txn.status === 'Pending_Return' && (
+                            <button onClick={() => handleApproveReturn(txn._id)} className="px-3 py-1.5 bg-indigo-50 text-slate-900 rounded text-sm font-semibold transition-colors">
+                              Approve Return
+                            </button>
+                          )}
+                          {txn.status === 'Returned' && txn.fineAmount > 0 && !txn.finePaid && (
+                            <button onClick={() => handleCollectFine(txn._id)} className="px-3 py-1.5 bg-amber-50 text-slate-900 rounded text-sm font-semibold transition-colors">
+                              Collect Fine
+                            </button>
+                          )}
                         </>
-                      )}
-                      {txn.status === 'Pending_Return' && (
-                        <button onClick={() => handleApproveReturn(txn._id)} className="px-3 py-1.5 bg-indigo-50 text-slate-900 rounded text-sm font-semibold transition-colors">
-                          Approve Return
-                        </button>
-                      )}
-                      {txn.status === 'Returned' && txn.fineAmount > 0 && !txn.finePaid && (
-                        <button onClick={() => handleCollectFine(txn._id)} className="px-3 py-1.5 bg-amber-50 text-slate-900 rounded text-sm font-semibold transition-colors">
-                          Collect Fine
-                        </button>
                       )}
                     </td>
                   </tr>

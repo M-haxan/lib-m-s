@@ -52,6 +52,28 @@ export default function BookDetails() {
     }
   };
 
+  const { data: reservations = [], refetch: refetchReservations } = useQuery({
+    queryKey: ['my-reservations'],
+    queryFn: async () => {
+      const { data } = await axios.get('/api/reservations/my-reservations', { withCredentials: true });
+      return data;
+    },
+    enabled: !!currentUser && currentUser.role === 'student',
+    staleTime: 30000,
+  });
+
+  const handleReserveBook = async () => {
+    try {
+      await axios.post('/api/reservations/reserve', { bookId: id }, { withCredentials: true });
+      toast.success('Book reserved successfully!');
+      refetchReservations();
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to reserve book');
+    }
+  };
+
+  const existingReservation = reservations.find(res => res.book?._id === id && res.status === 'Pending');
+
   if (isLoading) {
     return <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white">Loading...</div>;
   }
@@ -151,8 +173,25 @@ export default function BookDetails() {
                   </div>
                 )}
                 {currentUser && currentUser.role === 'student' && book.availableCopies === 0 && (
-                  <div className="text-rose-600 font-medium bg-rose-50 dark:bg-rose-900/20 px-6 py-4 rounded-xl border border-rose-100 dark:border-rose-900/50">
-                    Check back later when a copy is returned.
+                  <div className="bg-slate-100 p-6 rounded border space-y-4">
+                    <h3 className="font-bold text-slate-900">Book is Out of Stock</h3>
+                    {existingReservation ? (
+                      <div className="text-blue-600 font-medium bg-blue-50 px-6 py-4 rounded border border-blue-100">
+                        You have reserved this book! (Queue Position: {existingReservation.queuePosition || 1})
+                      </div>
+                    ) : (
+                      <>
+                        <p className="text-sm text-slate-600">
+                          All copies are currently issued. You can reserve this book to be added to the reservation queue.
+                        </p>
+                        <button
+                          onClick={handleReserveBook}
+                          className="w-full px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold transition-all hover:-translate-y-0.5 shadow-sm"
+                        >
+                          Reserve Book
+                        </button>
+                      </>
+                    )}
                   </div>
                 )}
                 {!currentUser && (

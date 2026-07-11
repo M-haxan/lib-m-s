@@ -9,14 +9,14 @@ import { IoPerson } from "react-icons/io5";
 import { MdEmail } from "react-icons/md";
 import { RiLockPasswordFill } from "react-icons/ri"
 import toast from 'react-hot-toast'
+import API from '../api/axios'
 
-// Lazmi: Har request k sath cookies bhejne k liye
-axios.defaults.withCredentials = true;
+
 
 function Signin() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  // Redux se loading aur error state nikal rahay hain
+ 
   const [loadings, setLoading] = useState(false)
   const { loading, error } = useSelector((state) => state.user);
 
@@ -28,17 +28,17 @@ function Signin() {
 
   const loginMutation = useMutation({
     mutationFn: async (data) => {
-      dispatch(signInStart()); // Redux: Loading start
+      dispatch(signInStart()); 
       
-      return await axios.post('/api/auth/login', data);
+      return await API.post('/api/auth/login', data);
       
     },
     onSuccess: (response) => {
-      // Redux: User data save karo
+     
       dispatch(signInSuccess(response.data)); 
       toast.success("user loged in Successfuly");
       setLoading (false)
-      // Role k mutabiq dashboard par bhejo
+     
       if (response.data.role === 'admin') {
         navigate('/admin-dashboard');
       } else {
@@ -46,7 +46,7 @@ function Signin() {
       }
     },
     onError: (err) => {
-      // Redux: Error save karo
+     
       dispatch(signInFailure(err.response?.data?.message || 'Login Failed!'));
       toast.error(error.response?.data?.message || 'login Failed!');
     }

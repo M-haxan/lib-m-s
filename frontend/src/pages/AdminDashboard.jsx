@@ -26,10 +26,8 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-[#FAFAFA]  text-slate-800 dark:text-slate-200">
       {/* Sidebar */}
-      <aside className="w-full md:w-64 bg-white  shadow-xl  border-r  flex flex-col transition-all duration-300">
-        <div className="p-6">
-          <h2 className="text-2xl font-bold bg-[#0052D6] text-white shadow-md rounded p-3 text-center">LibroAdmin</h2>
-        </div>
+      <aside className="w-full hidden md:flex md:w-64 bg-white  shadow-xl  border-r  flex flex-col transition-all duration-300">
+        
         <nav className="flex-grow px-4 pb-4 space-y-2 mt-4">
           <Link
             to="/admin-dashboard"

@@ -50,6 +50,40 @@ export default function Navbar() {
     markAllReadMutation.mutate();
   };
 
+  const deleteNotificationMutation = useMutation({
+    mutationFn: async (id) => axios.delete(`/api/notifications/${id}`, { withCredentials: true }),
+    onSuccess: (data, id) => {
+      // Find the ID in target (which is variables of mutationFn)
+      const deletedId = id;
+      queryClient.setQueryData(['notifications', currentUser?._id], (prev = []) => prev.filter(n => n._id !== deletedId));
+      toast.success('Notification cleared');
+    },
+    onError: (error) => {
+      console.error(error);
+      toast.error('Failed to clear notification');
+    }
+  });
+
+  const clearAllNotificationsMutation = useMutation({
+    mutationFn: async () => axios.delete('/api/notifications/clear-all', { withCredentials: true }),
+    onSuccess: () => {
+      queryClient.setQueryData(['notifications', currentUser?._id], []);
+      toast.success('All notifications cleared');
+    },
+    onError: (error) => {
+      console.error(error);
+      toast.error('Failed to clear all notifications');
+    }
+  });
+
+  const deleteNotification = (id) => {
+    deleteNotificationMutation.mutate(id);
+  };
+
+  const clearAllNotifications = () => {
+    clearAllNotificationsMutation.mutate();
+  };
+
   const handleLogout = async () => {
     try {
       const res = await fetch('/api/auth/logout');
@@ -88,7 +122,7 @@ export default function Navbar() {
                 <span className="text-white font-bold text-xl">L</span>
               </div>
               <span className="text-xl font-bold text-slate-500  hidden sm:block">
-                Libro
+                X-Y-Z Library
               </span>
             </Link>
           </div>
@@ -147,18 +181,33 @@ export default function Navbar() {
                       <div className="absolute right-0 mt-3 w-80 bg-white dark:bg-slate-800 rounded-xl shadow-2xl py-2 border border-slate-100 dark:border-slate-700 z-50">
                         <div className="px-4 py-2 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center">
                           <h3 className="font-bold text-slate-900 dark:text-white">Notifications</h3>
-                          {unreadCount > 0 && (
-                             <button onClick={markAllRead} className="text-xs text-blue-600 hover:text-blue-800 font-medium">Mark all read</button>
-                          )}
+                          <div className="flex items-center space-x-2">
+                            {unreadCount > 0 && (
+                               <button onClick={markAllRead} className="text-xs text-blue-600 hover:text-blue-800 font-medium">Mark all read</button>
+                            )}
+                            {unreadCount > 0 && notifications.length > 0 && <span className="text-slate-300 text-xs">|</span>}
+                            {notifications.length > 0 && (
+                               <button onClick={clearAllNotifications} className="text-xs text-rose-600 hover:text-rose-800 font-medium">Clear all</button>
+                            )}
+                          </div>
                         </div>
                         <div className="max-h-80 overflow-y-auto">
                            {notifications.length === 0 ? (
                              <p className="p-4 text-center text-sm text-slate-500">No notifications.</p>
                            ) : (
                              notifications.map(notif => (
-                               <div key={notif._id} className={`p-4 border-b border-slate-50 dark:border-slate-700/50 ${!notif.isRead ? 'bg-blue-50/50 dark:bg-blue-900/10' : ''}`}>
-                                  <p className="text-sm text-slate-800 dark:text-slate-200">{notif.message}</p>
-                                  <p className="text-xs text-slate-400 mt-1">{new Date(notif.createdAt).toLocaleString()}</p>
+                               <div key={notif._id} className={`p-4 border-b border-slate-50 dark:border-slate-700/50 flex justify-between items-start gap-2 ${!notif.isRead ? 'bg-blue-50/50 dark:bg-blue-900/10' : ''}`}>
+                                  <div className="flex-1">
+                                     <p className="text-sm text-slate-800 dark:text-slate-200">{notif.message}</p>
+                                     <p className="text-xs text-slate-400 mt-1">{new Date(notif.createdAt).toLocaleString()}</p>
+                                  </div>
+                                  <button 
+                                     onClick={(e) => { e.stopPropagation(); deleteNotification(notif._id); }}
+                                     className="text-slate-400 hover:text-rose-500 transition-colors p-1"
+                                     title="Clear notification"
+                                  >
+                                     <FaTimes size={14} />
+                                  </button>
                                </div>
                              ))
                            )}
@@ -212,14 +261,36 @@ export default function Navbar() {
                       <div className="absolute right-0 mt-3 w-72 bg-white dark:bg-slate-800 rounded-xl shadow-2xl py-2 border border-slate-100 dark:border-slate-700 z-50">
                         <div className="px-4 py-2 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center">
                           <h3 className="font-bold text-slate-900 dark:text-white">Notifications</h3>
-                          {unreadCount > 0 && <button onClick={markAllRead} className="text-xs text-blue-600 hover:text-blue-800 font-medium">Mark all read</button>}
+                          <div className="flex items-center space-x-2">
+                            {unreadCount > 0 && (
+                               <button onClick={markAllRead} className="text-xs text-blue-600 hover:text-blue-800 font-medium">Mark all read</button>
+                            )}
+                            {unreadCount > 0 && notifications.length > 0 && <span className="text-slate-300 text-xs">|</span>}
+                            {notifications.length > 0 && (
+                               <button onClick={clearAllNotifications} className="text-xs text-rose-600 hover:text-rose-800 font-medium">Clear all</button>
+                            )}
+                          </div>
                         </div>
                         <div className="max-h-60 overflow-y-auto">
-                           {notifications.map(notif => (
-                             <div key={notif._id} className="p-3 border-b border-slate-50 dark:border-slate-700/50">
-                                <p className="text-sm">{notif.message}</p>
-                             </div>
-                           ))}
+                           {notifications.length === 0 ? (
+                             <p className="p-4 text-center text-sm text-slate-500">No notifications.</p>
+                           ) : (
+                             notifications.map(notif => (
+                               <div key={notif._id} className={`p-3 border-b border-slate-50 dark:border-slate-700/50 flex justify-between items-start gap-2 ${!notif.isRead ? 'bg-blue-50/50 dark:bg-blue-900/10' : ''}`}>
+                                  <div className="flex-1">
+                                     <p className="text-sm text-slate-800 dark:text-slate-200">{notif.message}</p>
+                                     <p className="text-xs text-slate-400 mt-1">{new Date(notif.createdAt).toLocaleString()}</p>
+                                  </div>
+                                  <button 
+                                     onClick={(e) => { e.stopPropagation(); deleteNotification(notif._id); }}
+                                     className="text-slate-400 hover:text-rose-500 transition-colors p-1"
+                                     title="Clear notification"
+                                  >
+                                     <FaTimes size={14} />
+                                  </button>
+                               </div>
+                             ))
+                           )}
                         </div>
                       </div>
                  )}
@@ -236,40 +307,40 @@ export default function Navbar() {
       </div>
 
       {isMobileMenuOpen && (
-        <div className="lg:hidden border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4 space-y-4 shadow-xl">
+        <div className="lg:hidden   bg-white  p-4 space-y-4 shadow-xl">
           <form onSubmit={handleSearch}>
             <input 
               type="text" 
               placeholder="Search catalog..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full px-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-slate-200  rounded bg-slate-100  text-sm focus:outline-none  "
             />
           </form>
           
           <div className="flex flex-col space-y-2">
             {!currentUser && (
                <>
-                 <Link to="/" className="text-slate-600 dark:text-slate-300 hover:bg-slate-50 px-3 py-2 rounded-lg font-medium">Home</Link>
-                 <Link to="/catalog" className="text-slate-600 dark:text-slate-300 hover:bg-slate-50 px-3 py-2 rounded-lg font-medium">Catalog</Link>
-                 <Link to="/signin" className="text-blue-600 font-medium px-3 py-2">Login</Link>
-                 <Link to="/signup" className="text-slate-600 dark:text-slate-300 hover:bg-slate-50 px-3 py-2 rounded-lg font-medium">Register</Link>
+                 <Link to="/" className="text-slate-900 hover:bg-blue-600 px-3 py-2  font-bold">Home</Link>
+                 <Link to="/catalog" className="text-slate-900   px-3 py-2  font-bold">Catalog</Link>
+                 <Link to="/signin" className="text-slate-900 font-bold px-3 py-2">Login</Link>
+                 <Link to="/signup" className="text-slate-900   px-3 py-2  font-bold">Register</Link>
                </>
             )}
             {currentUser?.role === 'student' && (
                <>
-                 <Link to="/" className="text-slate-600 dark:text-slate-300 hover:bg-slate-50 px-3 py-2 rounded-lg font-medium">Home</Link>
-                 <Link to="/catalog" className="text-slate-600 dark:text-slate-300 hover:bg-slate-50 px-3 py-2 rounded-lg font-medium">Catalog</Link>
-                 <Link to="/student-dashboard" className="text-slate-600 dark:text-slate-300 hover:bg-slate-50 px-3 py-2 rounded-lg font-medium">Dashboard</Link>
+                 <Link to="/" className="text-slate-600  px-3 py-2  font-bold">Home</Link>
+                 <Link to="/catalog" className="text-slate-600  px-3 py-2  font-bold">Catalog</Link>
+                 <Link to="/student-dashboard" className="text-slate-600  hover:text-blue-600 px-3 py-2  font-bold">Dashboard</Link>
                  <button onClick={handleLogout} className="text-left text-rose-600 hover:bg-rose-50 px-3 py-2 rounded-lg font-medium">Logout</button>
                </>
             )}
             {currentUser?.role === 'admin' && (
                <>
-                 <Link to="/admin-dashboard" className="text-slate-600 dark:text-slate-300 hover:bg-slate-50 px-3 py-2 rounded-lg font-medium">Dashboard</Link>
-                 <Link to="/admin-dashboard/manage-books" className="text-slate-600 dark:text-slate-300 hover:bg-slate-50 px-3 py-2 rounded-lg font-medium">Books</Link>
-                 <Link to="/admin-dashboard/transactions" className="text-slate-600 dark:text-slate-300 hover:bg-slate-50 px-3 py-2 rounded-lg font-medium">Circulation</Link>
-                 <button onClick={handleLogout} className="text-left text-rose-600 hover:bg-rose-50 px-3 py-2 rounded-lg font-medium">Logout</button>
+                 <Link to="/admin-dashboard" className="text-slate-900   px-3 py-2  font-bold">Dashboard</Link>
+                 <Link to="/admin-dashboard/manage-books" className="text-slate-900  px-3 py-2  font-bold">Books</Link>
+                 <Link to="/admin-dashboard/transactions" className="text-slate-900   px-3 py-2 rounded-lg font-bold">Circulation</Link>
+                 <button onClick={handleLogout} className="text-left text-rose-600  px-3 py-2 rounded-lg font-medium">Logout</button>
                </>
             )}
           </div>
