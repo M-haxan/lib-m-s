@@ -115,3 +115,19 @@ export const getMyReservations = async (req, res, next) => {
         next(error);
     }
 };
+
+// @desc    Delete a reservation (Admin)
+// @route   DELETE /api/reservations/:id
+// @access  Private/Admin
+export const deleteReservation = async (req, res, next) => {
+    try {
+        const reservation = await ReservationModel.findById(req.params.id);
+        if (!reservation) {
+            return next(errorHandler(404, 'Reservation not found'));
+        }
+        await ReservationModel.findByIdAndDelete(req.params.id);
+        res.status(200).json({ success: true, message: 'Reservation record deleted successfully' });
+    } catch (error) {
+        next(error);
+    }
+};

@@ -24,6 +24,6 @@ import mongoose from "mongoose";
         type: Number,
        required: true
     }
- })
+ }, { timestamps: true })
 const UserModel = mongoose.model("User", userSchema)
 export default UserModel; 

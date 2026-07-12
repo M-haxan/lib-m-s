@@ -8,7 +8,8 @@ import {
     collectFine,
     getTransactions, 
     getRequests,
-    getMyTransactions 
+    getMyTransactions,
+    deleteTransaction
 } from '../controllers/transactionController.js';
 import { verifyToken } from '../utils/verifyUser.js';
 import { verifyAdmin } from '../utils/verifyAdmin.js';
@@ -27,5 +28,6 @@ router.post('/approve-return', verifyToken, verifyAdmin, approveReturn);
 router.post('/collect-fine', verifyToken, verifyAdmin, collectFine);
 router.get('/requests', verifyToken, verifyAdmin, getRequests);
 router.get('/', verifyToken, verifyAdmin, getTransactions);
+router.delete('/:id', verifyToken, verifyAdmin, deleteTransaction);
 
 export default router;

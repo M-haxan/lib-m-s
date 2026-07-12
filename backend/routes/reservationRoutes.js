@@ -1,5 +1,5 @@
 import express from 'express';
-import { reserveBook, cancelReservation, getReservations, getMyReservations } from '../controllers/reservationController.js';
+import { reserveBook, cancelReservation, getReservations, getMyReservations, deleteReservation } from '../controllers/reservationController.js';
 import { verifyToken } from '../utils/verifyUser.js';
 import { verifyAdmin } from '../utils/verifyAdmin.js';
 
@@ -9,5 +9,6 @@ router.post('/reserve', verifyToken, reserveBook);
 router.post('/cancel', verifyToken, cancelReservation);
 router.get('/', verifyToken, verifyAdmin, getReservations);
 router.get('/my-reservations', verifyToken, getMyReservations);
+router.delete('/:id', verifyToken, verifyAdmin, deleteReservation);
 
 export default router;

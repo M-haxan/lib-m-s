@@ -101,6 +101,9 @@ export const approveIssue = async (req, res, next) => {
         }
 
         const book = await BookModel.findById(transaction.book);
+        if (!book) {
+            return next(errorHandler(404, 'Book no longer exists in catalog.'));
+        }
         if (book.availableCopies <= 0) {
             return next(errorHandler(400, 'Book is no longer available.'));
         }
@@ -204,7 +207,7 @@ export const approveReturn = async (req, res, next) => {
             fineMsg = `A fine of PKR ${transaction.fineAmount} was applied.`;
 
             // Send notification
-            if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+            if (process.env.EMAIL_USER && process.env.EMAIL_PASS && transaction.user && transaction.book) {
                 const mailOptions = {
                     from: process.env.EMAIL_USER,
                     to: transaction.user.email,
@@ -217,47 +220,51 @@ export const approveReturn = async (req, res, next) => {
 
         await transaction.save();
 
-        const book = await BookModel.findById(transaction.book._id);
-        if (book) {
-            book.availableCopies += 1;
-            await book.save();
+        if (transaction.book) {
+            const book = await BookModel.findById(transaction.book._id);
+            if (book) {
+                book.availableCopies += 1;
+                await book.save();
 
-            const pendingReservations = await ReservationModel.find({ book: book._id, status: 'Pending' })
-                .sort({ createdAt: 1 })
-                .populate('user');
+                const pendingReservations = await ReservationModel.find({ book: book._id, status: 'Pending' })
+                    .sort({ createdAt: 1 })
+                    .populate('user');
 
-            let remainingCopies = book.availableCopies;
-            for (const reservation of pendingReservations) {
-                if (remainingCopies <= 0) break;
+                let remainingCopies = book.availableCopies;
+                for (const reservation of pendingReservations) {
+                    if (remainingCopies <= 0) break;
 
-                reservation.status = 'Fulfilled';
-                await reservation.save();
+                    reservation.status = 'Fulfilled';
+                    await reservation.save();
 
-                const reservationMessage = `A copy of "${book.title}" is now available for pickup.`;
-                await NotificationModel.create({
-                    user: reservation.user._id,
-                    message: reservationMessage,
-                    type: 'alert'
-                });
+                    const reservationMessage = `A copy of "${book.title}" is now available for pickup.`;
+                    await NotificationModel.create({
+                        user: reservation.user._id,
+                        message: reservationMessage,
+                        type: 'alert'
+                    });
 
-                if (reservation.user?.email) {
-                    await sendEmail(
-                        reservation.user.email,
-                        'Reserved Book Available',
-                        `<p>Dear ${reservation.user.name},</p><p>${reservationMessage}</p><p>Please collect it from the library desk.</p>`
-                    );
+                    if (reservation.user?.email) {
+                        await sendEmail(
+                            reservation.user.email,
+                            'Reserved Book Available',
+                            `<p>Dear ${reservation.user.name},</p><p>${reservationMessage}</p><p>Please collect it from the library desk.</p>`
+                        );
+                    }
+
+                    remainingCopies -= 1;
                 }
-
-                remainingCopies -= 1;
             }
         }
 
         // Notify Student
-        await NotificationModel.create({
-            user: transaction.user._id,
-            message: `Your return request for "${transaction.book.title}" is approved. ${fineMsg}`,
-            type: 'alert'
-        });
+        if (transaction.user) {
+            await NotificationModel.create({
+                user: transaction.user._id,
+                message: `Your return request for "${transaction.book?.title || 'Unknown Book'}" is approved. ${fineMsg}`,
+                type: 'alert'
+            });
+        }
 
         res.status(200).json({ message: `Return approved successfully. ${fineMsg}`, transaction });
     } catch (error) {
@@ -320,6 +327,22 @@ export const getMyTransactions = async (req, res, next) => {
     try {
         const transactions = await TransactionModel.find({ user: req.user.id }).populate('book').sort({ createdAt: -1 });
         res.status(200).json(transactions);
+    } catch (error) {
+        next(error);
+    }
+};
+
+// @desc    Delete a transaction (Admin)
+// @route   DELETE /api/transactions/:id
+// @access  Private/Admin
+export const deleteTransaction = async (req, res, next) => {
+    try {
+        const transaction = await TransactionModel.findById(req.params.id);
+        if (!transaction) {
+            return next(errorHandler(404, 'Transaction not found'));
+        }
+        await TransactionModel.findByIdAndDelete(req.params.id);
+        res.status(200).json({ success: true, message: 'Transaction record deleted successfully' });
     } catch (error) {
         next(error);
     }
