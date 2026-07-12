@@ -44,9 +44,29 @@ export default function StudentDashboard() {
     }
   });
 
-  const handleCancelReservation = async (reservationId) => {
-    if (!window.confirm('Are you sure you want to cancel this reservation?')) return;
-    cancelReservationMutation.mutate(reservationId);
+  const handleCancelReservation = (reservationId) => {
+    toast((t) => (
+      <div className="p-1">
+        <p className="text-sm font-semibold text-slate-800 mb-2">Cancel reservation?</p>
+        <div className="flex justify-end gap-2">
+          <button
+            onClick={() => {
+              toast.dismiss(t.id);
+              cancelReservationMutation.mutate(reservationId);
+            }}
+            className="px-3 py-1.5 bg-rose-500 hover:bg-rose-600 text-white rounded text-xs font-bold transition-all"
+          >
+            Confirm
+          </button>
+          <button
+            onClick={() => toast.dismiss(t.id)}
+            className="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded text-xs font-bold transition-all"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    ), { duration: 5000 });
   };
 
   const requestReturnMutation = useMutation({
@@ -62,9 +82,29 @@ export default function StudentDashboard() {
     }
   });
 
-  const handleRequestReturn = async (transactionId) => {
-    if (!window.confirm('Are you sure you want to request a return for this book?')) return;
-    requestReturnMutation.mutate(transactionId);
+  const handleRequestReturn = (transactionId) => {
+    toast((t) => (
+      <div className="p-1">
+        <p className="text-sm font-semibold text-slate-800 mb-2">Request return for this book?</p>
+        <div className="flex justify-end gap-2">
+          <button
+            onClick={() => {
+              toast.dismiss(t.id);
+              requestReturnMutation.mutate(transactionId);
+            }}
+            className="px-3 py-1.5 bg-rose-500 hover:bg-rose-600 text-white rounded text-xs font-bold transition-all"
+          >
+            Confirm
+          </button>
+          <button
+            onClick={() => toast.dismiss(t.id)}
+            className="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded text-xs font-bold transition-all"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    ), { duration: 5000 });
   };
 
   const currentlyIssued = transactions.filter(t => t.status === 'Issued' || t.status === 'Pending_Return');
@@ -133,8 +173,12 @@ export default function StudentDashboard() {
                       </td>
                       <td className="p-3 text-right">
                         {t.status === 'Issued' && (
-                          <button onClick={() => handleRequestReturn(t._id)} className="px-4 py-2 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded text-sm font-semibold transition-colors">
-                            Request Return
+                          <button
+                            disabled={requestReturnMutation.isPending && requestReturnMutation.variables === t._id}
+                            onClick={() => handleRequestReturn(t._id)}
+                            className="px-4 py-2 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded text-sm font-semibold transition-colors disabled:opacity-50"
+                          >
+                            {requestReturnMutation.isPending && requestReturnMutation.variables === t._id ? 'Requesting...' : 'Request Return'}
                           </button>
                         )}
                       </td>
@@ -214,10 +258,11 @@ export default function StudentDashboard() {
                       <td className="p-3 text-right">
                         {r.status === 'Pending' && (
                           <button
+                            disabled={cancelReservationMutation.isPending && cancelReservationMutation.variables === r._id}
                             onClick={() => handleCancelReservation(r._id)}
-                            className="px-4 py-2 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded text-sm font-semibold transition-colors"
+                            className="px-4 py-2 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded text-sm font-semibold transition-colors disabled:opacity-50"
                           >
-                            Cancel Reservation
+                            {cancelReservationMutation.isPending && cancelReservationMutation.variables === r._id ? 'Cancelling...' : 'Cancel Reservation'}
                           </button>
                         )}
                       </td>

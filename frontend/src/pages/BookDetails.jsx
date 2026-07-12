@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 
 const fetchBookDetails = async (id) => {
   const { data } = await axios.get('/api/books');
@@ -34,22 +34,29 @@ export default function BookDetails() {
     }
   }, [isError]);
 
-  const handleRequestIssue = async () => {
-    if (!fromDate || !toDate) {
-      return toast.error('Please select both From and To dates.');
-    }
-    try {
-      await axios.post('/api/transactions/request-issue', {
-        bookId: id,
-        fromDate,
-        toDate
-      }, { withCredentials: true });
+  const issueMutation = useMutation({
+    mutationFn: async (payload) => {
+      return await axios.post('/api/transactions/request-issue', payload, { withCredentials: true });
+    },
+    onSuccess: () => {
       toast.success('Issue request submitted! Pending Admin approval.');
       setFromDate('');
       setToDate('');
-    } catch (error) {
+    },
+    onError: (error) => {
       toast.error(error.response?.data?.message || 'Failed to request issue');
     }
+  });
+
+  const handleRequestIssue = () => {
+    if (!fromDate || !toDate) {
+      return toast.error('Please select both From and To dates.');
+    }
+    issueMutation.mutate({
+      bookId: id,
+      fromDate,
+      toDate
+    });
   };
 
   const { data: reservations = [], refetch: refetchReservations } = useQuery({
@@ -62,14 +69,21 @@ export default function BookDetails() {
     staleTime: 30000,
   });
 
-  const handleReserveBook = async () => {
-    try {
-      await axios.post('/api/reservations/reserve', { bookId: id }, { withCredentials: true });
+  const reserveMutation = useMutation({
+    mutationFn: async () => {
+      return await axios.post('/api/reservations/reserve', { bookId: id }, { withCredentials: true });
+    },
+    onSuccess: () => {
       toast.success('Book reserved successfully!');
       refetchReservations();
-    } catch (error) {
+    },
+    onError: (error) => {
       toast.error(error.response?.data?.message || 'Failed to reserve book');
     }
+  });
+
+  const handleReserveBook = () => {
+    reserveMutation.mutate();
   };
 
   const existingReservation = reservations.find(res => res.book?._id === id && res.status === 'Pending');
@@ -165,10 +179,11 @@ export default function BookDetails() {
                       </div>
                     </div>
                     <button
+                      disabled={issueMutation.isPending}
                       onClick={handleRequestIssue}
-                      className="w-full mt-4 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition-all hover:-translate-y-0.5 shadow-sm"
+                      className="w-full mt-4 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition-all hover:-translate-y-0.5 shadow-sm disabled:opacity-50"
                     >
-                      Submit Request
+                      {issueMutation.isPending ? 'Submitting Request...' : 'Submit Request'}
                     </button>
                   </div>
                 )}
@@ -185,10 +200,11 @@ export default function BookDetails() {
                           All copies are currently issued. You can reserve this book to be added to the reservation queue.
                         </p>
                         <button
+                          disabled={reserveMutation.isPending}
                           onClick={handleReserveBook}
-                          className="w-full px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold transition-all hover:-translate-y-0.5 shadow-sm"
+                          className="w-full px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold transition-all hover:-translate-y-0.5 shadow-sm disabled:opacity-50"
                         >
-                          Reserve Book
+                          {reserveMutation.isPending ? 'Reserving Book...' : 'Reserve Book'}
                         </button>
                       </>
                     )}

@@ -16,6 +16,7 @@ import Transactions from './pages/admin/Transactions';
 import ManageUsers from './pages/admin/ManageUsers';
 import Analytics from './pages/admin/Analytics';
 import StudentDashboard from './pages/StudentDashboard';
+import Profile from './pages/Profile';
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
         
         <Route element={<PrivateRoute />}>
            <Route path='/student-dashboard' element={<StudentDashboard />} />
+           <Route path='/profile' element={<Profile />} />
         </Route>
         
         <Route element={<AdminRoute />}>

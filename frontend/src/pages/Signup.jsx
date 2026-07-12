@@ -18,16 +18,13 @@ function Signup() {
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
-
-  // TanStack Query Mutation
   const registerMutation = useMutation({
     mutationFn: async (data) => {
       return await axios.post('/api/auth/register', data);
     },
     onSuccess: () => {
-      alert('Account Created Successfully! Please Log In.');
+      toast.success("User registered successfully");
       navigate('/signin');
-      toast.success("user Successfully register")
     },
     onError: (error) => {
       toast.error(error.response?.data?.message || 'Registration Failed!');
@@ -122,15 +119,12 @@ function Signup() {
 
           <div className="w-full flex flex-col gap-2">
             <button
-            
+              disabled={registerMutation.isPending}
               type="submit"
-              className="w-full bg-blue-600 text-white py-2 font-semibold tracking-widest text-sm hover:bg-blue-500 transition-colors"
+              className="w-full bg-blue-600 text-white py-2 font-semibold tracking-widest text-sm hover:bg-blue-500 transition-colors disabled:opacity-50"
             >
-
-              SignUp
+              {registerMutation.isPending ? 'Signing up...' : 'SignUp'}
             </button>
-           
-            
           </div>
         </form>
         <div className="mt-4 text-center flex items-center justify-center gap-1">

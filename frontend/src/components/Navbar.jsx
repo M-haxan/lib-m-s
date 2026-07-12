@@ -231,7 +231,7 @@ export default function Navbar() {
                            <p className="text-sm font-bold text-slate-900 capitalize ">{currentUser.name}</p>
                            <p className="text-xs text-slate-500 capitalize">{currentUser.role}</p>
                         </div>
-                        <Link to={currentUser.role === 'admin' ? "/admin-dashboard" : "/student-dashboard"} className="block px-4 py-2 text-sm text-slate-700  hover:bg-slate-50 ">
+                        <Link to="/profile" className="block px-4 py-2 text-sm text-slate-700  hover:bg-slate-50 ">
                           My Profile
                         </Link>
                         <button 
@@ -332,6 +332,7 @@ export default function Navbar() {
                  <Link to="/" className="text-slate-600  px-3 py-2  font-bold">Home</Link>
                  <Link to="/catalog" className="text-slate-600  px-3 py-2  font-bold">Catalog</Link>
                  <Link to="/student-dashboard" className="text-slate-600  hover:text-blue-600 px-3 py-2  font-bold">Dashboard</Link>
+                 <Link to="/profile" className="text-slate-600  hover:text-blue-600 px-3 py-2  font-bold">My Profile</Link>
                  <button onClick={handleLogout} className="text-left text-rose-600 hover:bg-rose-50 px-3 py-2 rounded-lg font-medium">Logout</button>
                </>
             )}
@@ -340,6 +341,7 @@ export default function Navbar() {
                  <Link to="/admin-dashboard" className="text-slate-900   px-3 py-2  font-bold">Dashboard</Link>
                  <Link to="/admin-dashboard/manage-books" className="text-slate-900  px-3 py-2  font-bold">Books</Link>
                  <Link to="/admin-dashboard/transactions" className="text-slate-900   px-3 py-2 rounded-lg font-bold">Circulation</Link>
+                 <Link to="/profile" className="text-slate-900  hover:text-blue-600 px-3 py-2  font-bold">My Profile</Link>
                  <button onClick={handleLogout} className="text-left text-rose-600  px-3 py-2 rounded-lg font-medium">Logout</button>
                </>
             )}

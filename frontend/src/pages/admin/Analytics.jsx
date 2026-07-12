@@ -112,7 +112,7 @@ export default function Analytics() {
       <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white p-6 rounded shadow-sm border gap-4">
             <div>
-               <h1 className="text-3xl font-bold text-slate-500">Library Analytics</h1>
+               <h1 className="text-3xl font-bold text-blue-600">Library Analytics</h1>
                <p className="text-slate-500 mt-1">Overview of system statistics and usage trends.</p>
             </div>
             <div className="flex space-x-3">

@@ -93,9 +93,97 @@ export default function Transactions() {
   const handleApproveReturn = (transactionId) => approveReturnMutation.mutate(transactionId);
   const handleCollectFine = (transactionId) => collectFineMutation.mutate(transactionId);
   const handleCancelReservation = (reservationId) => {
-    if (window.confirm('Are you sure you want to cancel this reservation?')) {
-      cancelReservationMutation.mutate(reservationId);
-    }
+    toast((t) => (
+      <div className="p-1">
+        <p className="text-sm font-semibold text-slate-800 mb-2">Cancel reservation?</p>
+        <div className="flex justify-end gap-2">
+          <button
+            onClick={() => {
+              toast.dismiss(t.id);
+              cancelReservationMutation.mutate(reservationId);
+            }}
+            className="px-3 py-1.5 bg-rose-500 hover:bg-rose-600 text-white rounded text-xs font-bold transition-all"
+          >
+            Confirm
+          </button>
+          <button
+            onClick={() => toast.dismiss(t.id)}
+            className="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded text-xs font-bold transition-all"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    ), { duration: 5000 });
+  };
+
+  const deleteTransactionMutation = useMutation({
+    mutationFn: async (transactionId) => axios.delete(`/api/transactions/${transactionId}`, { withCredentials: true }),
+    onSuccess: () => {
+      toast.success('Transaction record deleted successfully');
+      queryClient.invalidateQueries({ queryKey: ['transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['transaction-requests'] });
+    },
+    onError: (error) => toast.error(error.response?.data?.message || 'Failed to delete transaction record')
+  });
+
+  const deleteReservationMutation = useMutation({
+    mutationFn: async (reservationId) => axios.delete(`/api/reservations/${reservationId}`, { withCredentials: true }),
+    onSuccess: () => {
+      toast.success('Reservation record deleted successfully');
+      queryClient.invalidateQueries({ queryKey: ['admin-reservations'] });
+    },
+    onError: (error) => toast.error(error.response?.data?.message || 'Failed to delete reservation record')
+  });
+
+  const handleDeleteTransaction = (transactionId) => {
+    toast((t) => (
+      <div className="p-1">
+        <p className="text-sm font-semibold text-slate-800 mb-2">Delete this transaction history record?</p>
+        <div className="flex justify-end gap-2">
+          <button
+            onClick={() => {
+              toast.dismiss(t.id);
+              deleteTransactionMutation.mutate(transactionId);
+            }}
+            className="px-3 py-1.5 bg-rose-500 hover:bg-rose-600 text-white rounded text-xs font-bold transition-all"
+          >
+            Confirm
+          </button>
+          <button
+            onClick={() => toast.dismiss(t.id)}
+            className="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded text-xs font-bold transition-all"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    ), { duration: 5000 });
+  };
+
+  const handleDeleteReservation = (reservationId) => {
+    toast((t) => (
+      <div className="p-1">
+        <p className="text-sm font-semibold text-slate-800 mb-2">Delete this reservation record?</p>
+        <div className="flex justify-end gap-2">
+          <button
+            onClick={() => {
+              toast.dismiss(t.id);
+              deleteReservationMutation.mutate(reservationId);
+            }}
+            className="px-3 py-1.5 bg-rose-500 hover:bg-rose-600 text-white rounded text-xs font-bold transition-all"
+          >
+            Confirm
+          </button>
+          <button
+            onClick={() => toast.dismiss(t.id)}
+            className="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded text-xs font-bold transition-all"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    ), { duration: 5000 });
   };
 
   const loading = activeTab === 'requests' ? requestsLoading : activeTab === 'all' ? transactionsLoading : reservationsLoading;
@@ -104,27 +192,27 @@ export default function Transactions() {
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex justify-between items-center bg-white p-6 rounded shadow-sm border">
         <div>
-          <h1 className="text-3xl font-bold text-slate-500">Circulation & Requests</h1>
+          <h1 className="text-3xl font-bold text-blue-600">Circulation & Requests</h1>
           <p className="text-slate-500 mt-1">Manage issue requests, returns, and collect fines.</p>
         </div>
       </div>
 
-      <div className="flex space-x-4 mb-6">
+      <div className="flex flex-col sm:flex-row gap-3 mb-6">
         <button
           onClick={() => setActiveTab('requests')}
-          className={`px-6 py-3 rounded hover:bg-blue-400 font-semibold transition-all ${activeTab === 'requests' ? 'bg-blue-600 text-white shadow-md' : 'bg-blue-600 text-white shadow-md border'}`}
+          className={`w-full sm:w-auto px-6 py-3 rounded hover:bg-blue-400 font-semibold transition-all ${activeTab === 'requests' ? 'bg-blue-600 text-white shadow-md' : 'bg-blue-600 text-white shadow-md border'}`}
         >
           Pending Requests ({activeTab === 'requests' && !loading ? requests.length : '...'})
         </button>
         <button
           onClick={() => setActiveTab('all')}
-          className={`px-6 py-3 hover:bg-blue-400 rounded font-semibold transition-all ${activeTab === 'all' ? 'bg-blue-600 text-white shadow-md' : 'bg-blue-600 text-white shadow-md border'}`}
+          className={`w-full sm:w-auto px-6 py-3 hover:bg-blue-400 rounded font-semibold transition-all ${activeTab === 'all' ? 'bg-blue-600 text-white shadow-md' : 'bg-blue-600 text-white shadow-md border'}`}
         >
           All Transactions & Fines
         </button>
         <button
           onClick={() => setActiveTab('reservations')}
-          className={`px-6 py-3 hover:bg-blue-400 rounded font-semibold transition-all ${activeTab === 'reservations' ? 'bg-blue-600 text-white shadow-md' : 'bg-blue-600 text-white shadow-md border'}`}
+          className={`w-full sm:w-auto px-6 py-3 hover:bg-blue-400 rounded font-semibold transition-all ${activeTab === 'reservations' ? 'bg-blue-600 text-white shadow-md' : 'bg-blue-600 text-white shadow-md border'}`}
         >
           Reservation Queue ({activeTab === 'reservations' && !loading ? reservations.length : '...'})
         </button>
@@ -208,29 +296,69 @@ export default function Transactions() {
                     </td>
                     <td className="px-6 py-4 text-right space-x-2">
                       {activeTab === 'reservations' ? (
-                        txn.status === 'Pending' && (
-                          <button onClick={() => handleCancelReservation(txn._id)} className="px-3 py-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded text-sm font-semibold transition-colors">
-                            Cancel
+                        <>
+                          {txn.status === 'Pending' && (
+                            <button
+                              disabled={cancelReservationMutation.isPending && cancelReservationMutation.variables === txn._id}
+                              onClick={() => handleCancelReservation(txn._id)}
+                              className="px-3 py-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded text-sm font-semibold transition-colors disabled:opacity-50"
+                            >
+                              {cancelReservationMutation.isPending && cancelReservationMutation.variables === txn._id ? 'Cancelling...' : 'Cancel'}
+                            </button>
+                          )}
+                          <button
+                            disabled={deleteReservationMutation.isPending && deleteReservationMutation.variables === txn._id}
+                            onClick={() => handleDeleteReservation(txn._id)}
+                            className="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded text-sm font-semibold transition-all disabled:opacity-50"
+                          >
+                            {deleteReservationMutation.isPending && deleteReservationMutation.variables === txn._id ? 'Deleting...' : 'Delete'}
                           </button>
-                        )
+                        </>
                       ) : (
                         <>
                           {txn.status === 'Pending_Issue' && (
                             <>
-                              <button onClick={() => handleApproveIssue(txn._id)} className="px-3 py-1.5 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 rounded text-sm font-semibold transition-colors">Approve</button>
-                              <button onClick={() => handleRejectIssue(txn._id)} className="px-3 py-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded text-sm font-semibold transition-colors">Reject</button>
+                              <button
+                                disabled={approveIssueMutation.isPending && approveIssueMutation.variables === txn._id}
+                                onClick={() => handleApproveIssue(txn._id)}
+                                className="px-3 py-1.5 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 rounded text-sm font-semibold transition-colors disabled:opacity-50"
+                              >
+                                {approveIssueMutation.isPending && approveIssueMutation.variables === txn._id ? 'Approving...' : 'Approve'}
+                              </button>
+                              <button
+                                disabled={rejectIssueMutation.isPending && rejectIssueMutation.variables === txn._id}
+                                onClick={() => handleRejectIssue(txn._id)}
+                                className="px-3 py-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded text-sm font-semibold transition-colors disabled:opacity-50"
+                              >
+                                {rejectIssueMutation.isPending && rejectIssueMutation.variables === txn._id ? 'Rejecting...' : 'Reject'}
+                              </button>
                             </>
                           )}
                           {txn.status === 'Pending_Return' && (
-                            <button onClick={() => handleApproveReturn(txn._id)} className="px-3 py-1.5 bg-indigo-50 text-slate-900 rounded text-sm font-semibold transition-colors">
-                              Approve Return
+                            <button
+                              disabled={approveReturnMutation.isPending && approveReturnMutation.variables === txn._id}
+                              onClick={() => handleApproveReturn(txn._id)}
+                              className="px-3 py-1.5 bg-indigo-50 text-slate-900 rounded text-sm font-semibold transition-colors disabled:opacity-50"
+                            >
+                              {approveReturnMutation.isPending && approveReturnMutation.variables === txn._id ? 'Approving...' : 'Approve Return'}
                             </button>
                           )}
                           {txn.status === 'Returned' && txn.fineAmount > 0 && !txn.finePaid && (
-                            <button onClick={() => handleCollectFine(txn._id)} className="px-3 py-1.5 bg-amber-50 text-slate-900 rounded text-sm font-semibold transition-colors">
-                              Collect Fine
+                            <button
+                              disabled={collectFineMutation.isPending && collectFineMutation.variables === txn._id}
+                              onClick={() => handleCollectFine(txn._id)}
+                              className="px-3 py-1.5 bg-amber-50 text-slate-900 rounded text-sm font-semibold transition-colors disabled:opacity-50"
+                            >
+                              {collectFineMutation.isPending && collectFineMutation.variables === txn._id ? 'Collecting...' : 'Collect Fine'}
                             </button>
                           )}
+                          <button
+                            disabled={deleteTransactionMutation.isPending && deleteTransactionMutation.variables === txn._id}
+                            onClick={() => handleDeleteTransaction(txn._id)}
+                            className="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded text-sm font-semibold transition-all disabled:opacity-50"
+                          >
+                            {deleteTransactionMutation.isPending && deleteTransactionMutation.variables === txn._id ? 'Deleting...' : 'Delete'}
+                          </button>
                         </>
                       )}
                     </td>
