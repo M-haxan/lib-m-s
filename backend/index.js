@@ -21,7 +21,7 @@ startCronJobs();
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-  origin: 'http://localhost:5173', // Apne Vite frontend ka exact link dain
+  origin: true, // Dynamically reflects the request origin (allows all origins while supporting credentials: true)
   credentials: true, // Yeh true karna lazmi hai cookies ko allow karne k liye
 }));
 
