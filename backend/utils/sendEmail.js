@@ -3,11 +3,17 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const transporter = nodemailer.createTransport({
-  service: 'gmail', // or 'SendGrid' / your email provider
+  host: 'smtp.gmail.com',
+  port: 587,
+  secure: false,
+  family: 4, // Force IPv4 to avoid ENETUNREACH errors on hosts without IPv6 configuration
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
+  connectionTimeout: 5000, // fail fast in 5 seconds
+  greetingTimeout: 5000,
+  socketTimeout: 5000
 });
 
 export const sendEmail = async (to, subject, html) => {
@@ -18,7 +24,7 @@ export const sendEmail = async (to, subject, html) => {
     }
 
     const mailOptions = {
-      from: `"Libro Library" <${process.env.EMAIL_USER}>`,
+      from: `"Library" <${process.env.EMAIL_USER}>`,
       to,
       subject,
       html,

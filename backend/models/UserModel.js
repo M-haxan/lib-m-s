@@ -23,6 +23,27 @@ import mongoose from "mongoose";
     year:{
         type: Number,
        required: true
+    },
+    isEmailVerified: {
+        type: Boolean,
+        default: false
+    },
+    emailVerificationToken: {
+        type: String
+    },
+    preferences: {
+        type: [String],
+        default: []
+    },
+    isApproved: {
+        type: Boolean,
+        default: false
+    },
+    resetPasswordToken: {
+        type: String
+    },
+    resetPasswordExpires: {
+        type: Date
     }
  }, { timestamps: true })
 const UserModel = mongoose.model("User", userSchema)

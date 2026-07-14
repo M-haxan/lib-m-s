@@ -1,4 +1,6 @@
 import BookModel from '../models/BookModel.js';
+import UserModel from '../models/UserModel.js';
+import TransactionModel from '../models/TransactionModel.js';
 import { errorHandler } from '../utils/error.js';
 
 // @desc    Add a new book
@@ -123,6 +125,77 @@ export const getBooks = async (req, res, next) => {
         }
 
         const books = await BookModel.find(query).sort({ createdAt: -1 });
+        res.status(200).json(books);
+    } catch (error) {
+        next(error);
+    }
+};
+
+// @desc    Get top 5 recommended books based on user preferences
+// @route   GET /api/books/recommended
+// @access  Private
+export const getRecommendedBooks = async (req, res, next) => {
+    try {
+        const userId = req.user.id;
+        const user = await UserModel.findById(userId);
+        if (!user) {
+            return next(errorHandler(404, 'User not found'));
+        }
+
+        let query = {};
+        const hasPreferences = user.preferences && user.preferences.length > 0;
+        if (hasPreferences) {
+            query.category = { $in: user.preferences };
+        }
+
+        // Get 5 books matching preferences
+        let books = await BookModel.find(query).limit(5);
+
+        // If less than 5 books and user has no specific preferences, pad with other books
+        if (books.length < 5 && !hasPreferences) {
+            const padCount = 5 - books.length;
+            const existingIds = books.map(b => b._id);
+            const padBooks = await BookModel.find({ _id: { $nin: existingIds } }).limit(padCount);
+            books = [...books, ...padBooks];
+        }
+
+        res.status(200).json(books);
+    } catch (error) {
+        next(error);
+    }
+};
+
+// @desc    Get top 5 most issued books
+// @route   GET /api/books/most-issued
+// @access  Public
+export const getMostIssuedBooks = async (req, res, next) => {
+    try {
+        // Aggregate transactions to find most issued books
+        const issuedCounts = await TransactionModel.aggregate([
+            { $match: { status: { $in: ['Issued', 'Returned'] } } },
+            { $group: { _id: '$book', count: { $sum: 1 } } },
+            { $sort: { count: -1 } },
+            { $limit: 5 }
+        ]);
+
+        const bookIds = issuedCounts.map(item => item._id);
+        let books = [];
+        
+        if (bookIds.length > 0) {
+            // Find books matching the aggregated IDs
+            const fetchedBooks = await BookModel.find({ _id: { $in: bookIds } });
+            // Sort them to match aggregation order
+            books = bookIds.map(id => fetchedBooks.find(b => b._id.toString() === id.toString())).filter(Boolean);
+        }
+
+        // If less than 5 books, pad with other latest books
+        if (books.length < 5) {
+            const padCount = 5 - books.length;
+            const existingIds = books.map(b => b._id);
+            const padBooks = await BookModel.find({ _id: { $nin: existingIds } }).sort({ createdAt: -1 }).limit(padCount);
+            books = [...books, ...padBooks];
+        }
+
         res.status(200).json(books);
     } catch (error) {
         next(error);
