@@ -8,6 +8,8 @@ import authRouter from './routes/authroutes.js'
 import bookRouter from './routes/bookRoutes.js'
 import transactionRouter from './routes/transactionRoutes.js'
 import reservationRouter from './routes/reservationRoutes.js'
+import notificationRouter from './routes/notificationRoutes.js'
+import userRouter from './routes/userRoutes.js'
 import { startCronJobs } from './cronJobs.js'
 
 dotenv.config();
@@ -19,7 +21,7 @@ startCronJobs();
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-  origin: 'http://localhost:5174', // Apne Vite frontend ka exact link dain
+  origin: 'http://localhost:5173', // Apne Vite frontend ka exact link dain
   credentials: true, // Yeh true karna lazmi hai cookies ko allow karne k liye
 }));
 
@@ -27,6 +29,8 @@ app.use('/api/auth', authRouter);
 app.use('/api/books', bookRouter);
 app.use('/api/transactions', transactionRouter);
 app.use('/api/reservations', reservationRouter);
+app.use('/api/notifications', notificationRouter);
+app.use('/api/users', userRouter);
 const PORT = process.env.PORT || 5000;
 
   app.listen(PORT, () => {

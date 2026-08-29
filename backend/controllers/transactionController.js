@@ -1,6 +1,7 @@
 import TransactionModel from '../models/TransactionModel.js';
 import BookModel from '../models/BookModel.js';
 import UserModel from '../models/UserModel.js';
+import NotificationModel from '../models/NotificationModel.js';
 import { errorHandler } from '../utils/error.js';
 import nodemailer from 'nodemailer';
 
@@ -67,6 +68,18 @@ export const requestIssue = async (req, res, next) => {
         });
 
         await newReq.save();
+
+        // Notify Admins
+        const admins = await UserModel.find({ role: 'admin' });
+        const notifications = admins.map(admin => ({
+            user: admin._id,
+            message: `New book issue request for "${book.title}" from user.`,
+            type: 'request'
+        }));
+        if (notifications.length > 0) {
+            await NotificationModel.insertMany(notifications);
+        }
+
         res.status(201).json({ message: 'Book issue requested successfully', transaction: newReq });
     } catch (error) {
         next(error);
@@ -95,6 +108,13 @@ export const approveIssue = async (req, res, next) => {
 
         book.availableCopies -= 1;
         await book.save();
+
+        // Notify Student
+        await NotificationModel.create({
+            user: transaction.user,
+            message: `Your issue request for "${book.title}" has been approved!`,
+            type: 'alert'
+        });
 
         res.status(200).json({ message: 'Issue approved successfully', transaction });
     } catch (error) {
@@ -138,6 +158,17 @@ export const requestReturn = async (req, res, next) => {
         transaction.status = 'Pending_Return';
         await transaction.save();
 
+        // Notify Admins
+        const admins = await UserModel.find({ role: 'admin' });
+        const notifications = admins.map(admin => ({
+            user: admin._id,
+            message: `User requested to return the book.`,
+            type: 'request'
+        }));
+        if (notifications.length > 0) {
+            await NotificationModel.insertMany(notifications);
+        }
+
         res.status(200).json({ message: 'Return request submitted.', transaction });
     } catch (error) {
         next(error);
@@ -165,10 +196,10 @@ export const approveReturn = async (req, res, next) => {
             const diffTime = transaction.returnDate.getTime() - transaction.dueDate.getTime();
             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
             
-            // Assume $2 per day fine
-            transaction.fineAmount = diffDays * 2; 
+            // Assume PKR 100 per day fine
+            transaction.fineAmount = diffDays * 100; 
             transaction.finePaid = false;
-            fineMsg = `A fine of $${transaction.fineAmount} was applied.`;
+            fineMsg = `A fine of PKR ${transaction.fineAmount} was applied.`;
 
             // Send notification
             if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
@@ -176,7 +207,7 @@ export const approveReturn = async (req, res, next) => {
                     from: process.env.EMAIL_USER,
                     to: transaction.user.email,
                     subject: 'Overdue Book Fine Notice',
-                    text: `Dear ${transaction.user.name},\n\nYou have returned "${transaction.book.title}" late by ${diffDays} days.\nA fine of $${transaction.fineAmount} has been charged to your account.\nPlease clear your dues at the library desk.\n\nRegards,\nLibro Library`
+                    text: `Dear ${transaction.user.name},\n\nYou have returned "${transaction.book.title}" late by ${diffDays} days.\nA fine of PKR ${transaction.fineAmount} has been charged to your account.\nPlease clear your dues at the library desk.\n\nRegards,\nLibro Library`
                 };
                 transporter.sendMail(mailOptions).catch(err => console.log('Mail error:', err));
             }
@@ -189,6 +220,13 @@ export const approveReturn = async (req, res, next) => {
             book.availableCopies += 1;
             await book.save();
         }
+
+        // Notify Student
+        await NotificationModel.create({
+            user: transaction.user._id,
+            message: `Your return request for "${transaction.book.title}" is approved. ${fineMsg}`,
+            type: 'alert'
+        });
 
         res.status(200).json({ message: `Return approved successfully. ${fineMsg}`, transaction });
     } catch (error) {
