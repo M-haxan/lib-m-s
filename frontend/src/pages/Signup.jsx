@@ -22,7 +22,7 @@ function Signup() {
   // TanStack Query Mutation
   const registerMutation = useMutation({
     mutationFn: async (data) => {
-      return await axios.post('http://localhost:3000/api/auth/register', data);
+      return await axios.post('/api/auth/register', data);
     },
     onSuccess: () => {
       alert('Account Created Successfully! Please Log In.');
@@ -40,7 +40,7 @@ function Signup() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-5rem)] bg-[#ECF1FB] flex items-center justify-center p-4">
+    <div className="min-h-[calc(100vh-5rem)] bg-[#FAFAFA] flex items-center justify-center p-4">
 
 <div className="relative bg-white rounded-[2rem] shadow-lg w-full max-w-sm pt-16 pb-8 px-6 sm:px-10 mt-16">
 

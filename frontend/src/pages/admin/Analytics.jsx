@@ -114,41 +114,38 @@ export default function Analytics() {
 
    return (
       <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 gap-4">
+         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white  p-6 rounded shadow-sm border  gap-4">
             <div>
-               <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Library Analytics</h1>
-               <p className="text-slate-500 dark:text-slate-400 mt-1">Overview of system statistics and usage trends.</p>
+               <h1 className="text-3xl font-bold  text-slate-500 ">Library Analytics</h1>
+               <p className="text-slate-500 mt-1">Overview of system statistics and usage trends.</p>
             </div>
             <div className="flex space-x-3">
-               <button onClick={exportPDF} className="px-4 py-2 bg-rose-50 text-rose-600 hover:bg-rose-100 dark:bg-rose-900/20 dark:text-rose-400 rounded-xl text-sm font-semibold transition-colors">
-                  Download PDF
-               </button>
-               <button onClick={exportExcel} className="px-4 py-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400 rounded-xl text-sm font-semibold transition-colors">
-                  Download Excel
+               <button onClick={exportExcel} className="px-4 py-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-100  dark:text-emerald-400 rounded text-sm font-semibold transition-colors">
+                  Download Report
                </button>
             </div>
          </div>
 
          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-            <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 hover:-translate-y-1 transition-transform">
-               <h3 className="text-slate-500 dark:text-slate-400 font-medium">Total Books</h3>
-               <p className="text-4xl font-bold text-slate-900 dark:text-white mt-2">{stats.totalBooks}</p>
+            <div className="bg-white  p-6 rounded shadow-sm border  hover:-translate-y-1 transition-transform">
+               <h3 className="text-slate-500  font-bold">Total Books</h3>
+               <p className="text-4xl font-bold text-slate-900  mt-2">{stats.totalBooks}</p>
             </div>
-            <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 hover:-translate-y-1 transition-transform">
-               <h3 className="text-slate-500 dark:text-slate-400 font-medium">Total Users</h3>
+            <div className="bg-white  p-6 rounded shadow-sm border  hover:-translate-y-1 transition-transform">
+               <h3 className="text-slate-500  font-bold">Total Users</h3>
                <p className="text-4xl font-bold text-indigo-600 dark:text-indigo-400 mt-2">{stats.totalUsers}</p>
             </div>
-            <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 hover:-translate-y-1 transition-transform">
-               <h3 className="text-slate-500 dark:text-slate-400 font-medium">Active Issues</h3>
+            <div className="bg-white  p-6 rounded shadow-sm border  hover:-translate-y-1 transition-transform">
+               <h3 className="text-slate-500  font-bold">Active Issues</h3>
                <p className="text-4xl font-bold text-blue-600 dark:text-blue-400 mt-2">{stats.activeIssues}</p>
             </div>
-            <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 hover:-translate-y-1 transition-transform">
-               <h3 className="text-slate-500 dark:text-slate-400 font-medium">Pending Requests</h3>
+            <div className="bg-white  p-6 rounded shadow-sm border  hover:-translate-y-1 transition-transform">
+               <h3 className="text-slate-500  font-bold">Pending Requests</h3>
                <p className="text-4xl font-bold text-amber-600 dark:text-amber-400 mt-2">{stats.pendingRequests}</p>
             </div>
-            <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 hover:-translate-y-1 transition-transform">
-               <h3 className="text-slate-500 dark:text-slate-400 font-medium">Fines Collected</h3>
-               <p className="text-4xl font-bold text-rose-600 dark:text-rose-400 mt-2">PKR {stats.totalFines}</p>
+            <div className="bg-white  p-6 rounded shadow-sm border  hover:-translate-y-1 transition-transform">
+               <h3 className="text-slate-500  font-bold">Fines Collected</h3>
+               <p className="text-2xl font-medium text-rose-600 dark:text-rose-400 mt-2">PKR:{stats.totalFines}</p>
             </div>
          </div>
       </div>

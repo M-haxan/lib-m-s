@@ -58,13 +58,13 @@ export default function BookDetails() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 p-6 md:p-12">
+    <div className="min-h-screen bg-slate-50  text-slate-900 dark:text-slate-100 p-6 md:p-12">
       <div className="max-w-5xl mx-auto">
         <button onClick={() => navigate(-1)} className="mb-6 text-slate-500 hover:text-blue-600 font-medium transition-colors">
           &larr; Back to Catalog
         </button>
         
-        <div className="bg-white dark:bg-slate-800 rounded-3xl p-8 shadow-xl border border-slate-100 dark:border-slate-700 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="bg-white  rounded p-8 shadow-xl border  animate-in fade-in slide-in-from-bottom-4 duration-500">
           <div className="flex flex-col md:flex-row gap-10">
             {/* Book Cover */}
             <div className="w-full md:w-1/3 shrink-0">
@@ -77,37 +77,37 @@ export default function BookDetails() {
             <div className="flex flex-col flex-grow">
                <div className="space-y-2">
                  <div className="flex justify-between items-start">
-                   <h1 className="text-3xl md:text-4xl font-bold dark:text-white">{book.title}</h1>
-                   <span className="px-4 py-1.5 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full text-sm font-semibold tracking-wide">
+                   <h1 className="text-3xl md:text-4xl font-bold text-slate-500 ">{book.title}</h1>
+                   <span className="px-4 py-1.5 bg-blue-50  text-blue-600 dark:text-blue-400 rounded text-sm font-semibold tracking-wide">
                      {book.category}
                    </span>
                  </div>
                  <p className="text-xl text-slate-500 dark:text-slate-400">by {book.author}</p>
                </div>
 
-               <div className="mt-8 grid grid-cols-2 gap-6 p-6 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-slate-700">
+               <div className="mt-8 grid grid-cols-2 gap-6 p-6 bg-slate-100  rounded ">
                   <div>
-                    <p className="text-sm text-slate-500 dark:text-slate-400">ISBN</p>
-                    <p className="font-medium dark:text-white">{book.isbn}</p>
+                    <p className="text-sm font-bold text-slate-900 ">ISBN</p>
+                    <p className="font-medium text-slate-500 ">{book.isbn}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-slate-500 dark:text-slate-400">Publisher</p>
-                    <p className="font-medium dark:text-white">{book.publisher}</p>
+                    <p className="text-sm font-bold text-slate-900 ">Publisher</p>
+                    <p className="font-medium text-slate-500 ">{book.publisher}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-slate-500 dark:text-slate-400">Publication Year</p>
-                    <p className="font-medium dark:text-white">{book.year}</p>
+                    <p className="text-md font-bold text-slate-900 ">Publication Year</p>
+                    <p className="font-medium text-slate-500 ">{book.year}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-slate-500 dark:text-slate-400">Total Copies</p>
-                    <p className="font-medium dark:text-white">{book.quantity}</p>
+                    <p className="text-sm font-bold text-slate-900 ">Total Copies</p>
+                    <p className="font-medium text-slate-500 ">{book.quantity}</p>
                   </div>
                </div>
 
                <div className="mt-auto pt-8">
                  <div className="flex justify-between items-end mb-6">
                    <div>
-                      <p className="text-sm text-slate-500 dark:text-slate-400">Availability Status</p>
+                      <p className="text-sm font-bold text-slate-900 ">Availability Status</p>
                       {book.availableCopies > 0 ? (
                         <p className="text-2xl font-bold text-emerald-500">{book.availableCopies} Copies Available</p>
                       ) : (
@@ -117,27 +117,27 @@ export default function BookDetails() {
                  </div>
 
                  {currentUser && currentUser.role === 'student' && book.availableCopies > 0 && (
-                   <div className="bg-slate-50 dark:bg-slate-900/50 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-4">
-                      <h3 className="font-semibold text-slate-900 dark:text-white">Request to Borrow</h3>
+                   <div className="bg-slate-100  p-6 rounded border  space-y-4">
+                      <h3 className="font-bold text-slate-900 ">Request to Borrow</h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                          <div>
-                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">From Date</label>
+                            <label className="block text-sm font-medium text-slate-900  mb-1">From Date</label>
                             <input 
                               type="date" 
                               value={fromDate}
                               min={new Date().toISOString().split('T')[0]}
                               onChange={(e) => setFromDate(e.target.value)}
-                              className="w-full px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+                              className="w-full px-4 py-2 bg-white text-slate-500 border  rounded  outline-none"
                             />
                          </div>
                          <div>
-                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">To Date (Max 10 days)</label>
+                            <label className="block text-sm font-medium text-slate-900  mb-1">To Date (Max 10 days)</label>
                             <input 
                               type="date" 
                               value={toDate}
                               min={fromDate || new Date().toISOString().split('T')[0]}
                               onChange={(e) => setToDate(e.target.value)}
-                              className="w-full px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+                              className="w-full px-4 py-2 bg-white text-slate-500 border rounded  outline-none"
                             />
                          </div>
                       </div>

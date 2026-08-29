@@ -76,23 +76,7 @@ export default function Navbar() {
 
   const unreadCount = notifications.filter(n => !n.isRead).length;
 
-  const SearchBar = () => (
-    <form onSubmit={handleSearch} className="flex-1 max-w-lg mx-4 hidden md:flex">
-      <div className="relative w-full">
-        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <FaSearch className="text-slate-400" />
-        </div>
-        <input 
-          type="text" 
-          placeholder="Search catalog..." 
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-10 pr-4 py-2 border border-slate-400  rounded bg-[#FFFFFF]  text-sm focus:outline-none    transition-all text-slate-900"
-        />
-      </div>
-    </form>
-  );
-
+  
   return (
     <nav className="bg-[#FFFFFF] sticky top-0 z-50 shadow-sm border-b border-slate-200 dark:border-slate-800 backdrop-blur-md bg-opacity-80 dark:bg-opacity-80">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -110,7 +94,20 @@ export default function Navbar() {
             </Link>
           </div>
 
-          <SearchBar />
+          <form onSubmit={handleSearch} className="flex-1 max-w-lg mx-4 hidden md:flex">
+      <div className="relative w-full">
+        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <FaSearch className="text-slate-400" />
+        </div>
+        <input 
+          type="text" 
+          placeholder="Search catalog..." 
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full pl-10 pr-4 py-2 border border-slate-400  rounded bg-[#FFFFFF]  text-sm focus:outline-none    transition-all text-slate-900"
+        />
+      </div>
+    </form>
 
           {/* Right Side Items */}
           <div className="hidden lg:flex items-center space-x-6">
@@ -196,12 +193,12 @@ export default function Navbar() {
                     </button>
                     
                     {showProfileMenu && (
-                      <div className="absolute right-0 mt-3 w-48 bg-white dark:bg-slate-800 rounded-xl shadow-2xl py-1 border border-slate-100 dark:border-slate-700 z-50">
+                      <div className="absolute right-0 mt-3 w-48 bg-white  rounded shadow-2xl py-1   z-50">
                         <div className="px-4 py-2 border-b border-slate-100 dark:border-slate-700">
-                           <p className="text-sm font-bold text-slate-900 dark:text-white">{currentUser.name}</p>
+                           <p className="text-sm font-bold text-slate-900 capitalize ">{currentUser.name}</p>
                            <p className="text-xs text-slate-500 capitalize">{currentUser.role}</p>
                         </div>
-                        <Link to={currentUser.role === 'admin' ? "/admin-dashboard" : "/student-dashboard"} className="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700">
+                        <Link to={currentUser.role === 'admin' ? "/admin-dashboard" : "/student-dashboard"} className="block px-4 py-2 text-sm text-slate-700  hover:bg-slate-50 ">
                           My Profile
                         </Link>
                         <button 

@@ -24,34 +24,34 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200">
+    <div className="min-h-screen flex flex-col md:flex-row bg-[#FAFAFA]  text-slate-800 dark:text-slate-200">
       {/* Sidebar */}
-      <aside className="w-full md:w-64 bg-white dark:bg-slate-800 shadow-xl border-r border-slate-200 dark:border-slate-700 flex flex-col transition-all duration-300">
+      <aside className="w-full md:w-64 bg-white  shadow-xl  border-r  flex flex-col transition-all duration-300">
         <div className="p-6">
-          <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">LibroAdmin</h2>
+          <h2 className="text-2xl font-bold bg-[#0052D6] text-white shadow-md rounded p-3 text-center">LibroAdmin</h2>
         </div>
         <nav className="flex-grow px-4 pb-4 space-y-2 mt-4">
           <Link
             to="/admin-dashboard"
-            className={`flex items-center space-x-3 p-3 rounded-xl transition-all duration-200 ${location.pathname === '/admin-dashboard' ? 'bg-blue-600 text-white shadow-md shadow-blue-500/30' : 'hover:bg-slate-100 dark:hover:bg-slate-700'}`}
+            className={`flex text-slate-500 items-center space-x-3 p-3 rounded transition-all duration-200 ${location.pathname === '/admin-dashboard' ? 'bg-blue-600 text-white shadow-md shadow-blue-500/30' : 'hover:bg-slate-200 '}`}
           >
             <span>Dashboard</span>
           </Link>
           <Link
             to="/admin-dashboard/manage-books"
-            className={`flex items-center space-x-3 p-3 rounded-xl transition-all duration-200 ${location.pathname.includes('/manage-books') ? 'bg-blue-600 text-white shadow-md shadow-blue-500/30' : 'hover:bg-slate-100 dark:hover:bg-slate-700'}`}
+            className={`flex text-slate-500 items-center space-x-3 p-3 rounded transition-all duration-200 ${location.pathname.includes('/manage-books') ? 'bg-blue-600 text-white shadow-md shadow-blue-500/30' : 'hover:bg-slate-200 '}`}
           >
             <span>Manage Books</span>
           </Link>
           <Link
             to="/admin-dashboard/transactions"
-            className={`flex items-center space-x-3 p-3 rounded-xl transition-all duration-200 ${location.pathname.includes('/transactions') ? 'bg-blue-600 text-white shadow-md shadow-blue-500/30' : 'hover:bg-slate-100 dark:hover:bg-slate-700'}`}
+            className={`flex text-slate-500 items-center space-x-3 p-3 rounded transition-all duration-200 ${location.pathname.includes('/transactions') ? 'bg-blue-600 text-white shadow-md shadow-blue-500/30' : 'hover:bg-slate-200 '}`}
           >
             <span>Issue / Return</span>
           </Link>
           <Link
             to="/admin-dashboard/manage-users"
-            className={`flex items-center space-x-3 p-3 rounded-xl transition-all duration-200 ${location.pathname.includes('/manage-users') ? 'bg-blue-600 text-white shadow-md shadow-blue-500/30' : 'hover:bg-slate-100 dark:hover:bg-slate-700'}`}
+            className={`flex text-slate-500 items-center space-x-3 p-3 rounded transition-all duration-200 ${location.pathname.includes('/manage-users') ? 'bg-blue-600 text-white shadow-md shadow-blue-500/30' : 'hover:bg-slate-200 '}`}
           >
             <span>Users</span>
           </Link>
@@ -59,7 +59,7 @@ export default function AdminDashboard() {
         <div className="p-4 border-t border-slate-200 dark:border-slate-700">
           <button
             onClick={handleLogout}
-            className="w-full flex items-center justify-center space-x-2 p-3 bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 rounded-xl hover:bg-rose-100 dark:hover:bg-rose-900/40 transition-colors"
+            className="w-full flex items-center justify-center space-x-2 p-3 bg-rose-200  text-rose-600 dark:text-rose-400 rounded hover:bg-rose-100  transition-colors"
           >
             <span>Logout</span>
           </button>

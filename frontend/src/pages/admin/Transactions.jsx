@@ -83,33 +83,33 @@ export default function Transactions() {
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="flex justify-between items-center bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
+      <div className="flex justify-between items-center bg-white  p-6 rounded shadow-sm border ">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Circulation & Requests</h1>
-          <p className="text-slate-500 dark:text-slate-400 mt-1">Manage issue requests, returns, and collect fines.</p>
+          <h1 className="text-3xl font-bold text-slate-500 ">Circulation & Requests</h1>
+          <p className="text-slate-500  mt-1">Manage issue requests, returns, and collect fines.</p>
         </div>
       </div>
 
       <div className="flex space-x-4 mb-6">
         <button 
           onClick={() => setActiveTab('requests')}
-          className={`px-6 py-3 rounded-xl font-semibold transition-all ${activeTab === 'requests' ? 'bg-blue-600 text-white shadow-md' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700'}`}
+          className={`px-6 py-3 rounded hover:bg-blue-400 font-semibold transition-all ${activeTab === 'requests' ? 'bg-blue-600 text-white shadow-md' : 'bg-blue-600 text-white shadow-md '}`}
         >
           Pending Requests ({activeTab === 'requests' && !loading ? requests.length : '...'})
         </button>
         <button 
           onClick={() => setActiveTab('all')}
-          className={`px-6 py-3 rounded-xl font-semibold transition-all ${activeTab === 'all' ? 'bg-blue-600 text-white shadow-md' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700'}`}
+          className={`px-6 py-3 hover:bg-blue-400 rounded font-semibold transition-all ${activeTab === 'all' ? 'bg-blue-600 text-white shadow-md' : 'bg-blue-600 text-white shadow-md border '}`}
         >
           All Transactions & Fines
         </button>
       </div>
 
-      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
+      <div className="bg-white  rounded shadow-sm border  overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse min-w-max">
-            <thead>
-              <tr className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 text-sm uppercase tracking-wider">
+            <thead className='bg-slate-200'>
+              <tr className="bg-slate-50  text-slate-500 text-sm uppercase tracking-wider">
                 <th className="px-6 py-4 font-medium">Book Details</th>
                 <th className="px-6 py-4 font-medium">Student</th>
                 <th className="px-6 py-4 font-medium">Dates</th>
@@ -126,12 +126,12 @@ export default function Transactions() {
                 <tr><td colSpan="5" className="px-6 py-8 text-center text-slate-500">No transactions found.</td></tr>
               ) : (
                 (activeTab === 'requests' ? requests : transactions).map((txn) => (
-                  <tr key={txn._id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors">
+                  <tr key={txn._id} className="hover:bg-slate-100  transition-colors">
                     <td className="px-6 py-4">
-                      <div className="font-semibold text-slate-900 dark:text-slate-100">{txn.book?.title || 'Unknown Book'}</div>
+                      <div className="font-semibold text-slate-900 capitalize ">{txn.book?.title || 'Unknown Book'}</div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="font-semibold text-slate-900 dark:text-slate-100">{txn.user?.name || 'Unknown User'}</div>
+                      <div className="font-semibold text-slate-900 capitalize">{txn.user?.name || 'Unknown User'}</div>
                       <div className="text-xs text-slate-500">{txn.user?.email || txn.user?._id}</div>
                     </td>
                     <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">
@@ -139,7 +139,7 @@ export default function Transactions() {
                       <div><span className="font-medium">To:</span> {new Date(txn.dueDate).toLocaleDateString()}</div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`px-3 py-1 rounded-full text-xs font-bold 
+                      <span className={`px-3 py-1 rounded text-xs font-bold 
                         ${txn.status === 'Pending_Issue' ? 'bg-indigo-100 text-indigo-700' : ''}
                         ${txn.status === 'Pending_Return' ? 'bg-amber-100 text-amber-700' : ''}
                         ${txn.status === 'Issued' ? 'bg-blue-100 text-blue-700' : ''}
@@ -157,17 +157,17 @@ export default function Transactions() {
                     <td className="px-6 py-4 text-right space-x-2">
                       {txn.status === 'Pending_Issue' && (
                         <>
-                          <button onClick={() => handleApproveIssue(txn._id)} className="px-3 py-1.5 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 rounded-lg text-sm font-semibold transition-colors">Approve</button>
-                          <button onClick={() => handleRejectIssue(txn._id)} className="px-3 py-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-lg text-sm font-semibold transition-colors">Reject</button>
+                          <button onClick={() => handleApproveIssue(txn._id)} className="px-3 py-1.5 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 rounded text-sm font-semibold transition-colors">Approve</button>
+                          <button onClick={() => handleRejectIssue(txn._id)} className="px-3 py-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded text-sm font-semibold transition-colors">Reject</button>
                         </>
                       )}
                       {txn.status === 'Pending_Return' && (
-                        <button onClick={() => handleApproveReturn(txn._id)} className="px-3 py-1.5 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded-lg text-sm font-semibold transition-colors">
+                        <button onClick={() => handleApproveReturn(txn._id)} className="px-3 py-1.5 bg-indigo-50 text-slate-900  rounded text-sm font-semibold transition-colors">
                           Approve Return
                         </button>
                       )}
                       {txn.status === 'Returned' && txn.fineAmount > 0 && !txn.finePaid && (
-                        <button onClick={() => handleCollectFine(txn._id)} className="px-3 py-1.5 bg-amber-50 text-amber-600 hover:bg-amber-100 rounded-lg text-sm font-semibold transition-colors">
+                        <button onClick={() => handleCollectFine(txn._id)} className="px-3 py-1.5 bg-amber-50 text-slate-900  rounded text-sm font-semibold transition-colors">
                           Collect Fine
                         </button>
                       )}

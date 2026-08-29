@@ -43,24 +43,24 @@ export default function StudentDashboard() {
   const activeCount = currentlyIssued.length + pendingRequests.length;
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 p-6 md:p-12">
+    <div className="min-h-screen bg-[#F8F9FA] text-slate-900 dark:text-slate-100 p-6 md:p-12">
       <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
 
-        <div className="bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700">
-          <h1 className="text-3xl font-bold">Welcome back, {currentUser.name}!</h1>
+        <div className="bg-white p-8 rounded shadow-sm border">
+          <h1 className="text-3xl font-bold text-slate-500">Welcome back, {currentUser.name}!</h1>
           <p className="text-slate-500 mt-2">Manage your active issues, return requests, and track your fines.</p>
           <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="bg-blue-50 dark:bg-blue-900/20 px-6 py-4 rounded-2xl border border-blue-100 dark:border-blue-900/50">
-              <p className="text-sm text-blue-600 dark:text-blue-400 font-medium">Active Books / Requests</p>
-              <p className="text-3xl font-bold text-blue-700 dark:text-blue-300">{activeCount} / 4</p>
+            <div className="bg-blue-100 p-6 py-4 rounded border ">
+              <p className="text-md text-blue-600 font-bold">Active Books / Requests</p>
+              <p className="text-3xl font-bold text-blue-400 ">{activeCount} / 4</p>
             </div>
-            <div className="bg-emerald-50 dark:bg-emerald-900/20 px-6 py-4 rounded-2xl border border-emerald-100 dark:border-emerald-900/50">
-              <p className="text-sm text-emerald-600 dark:text-emerald-400 font-medium">Returned Books</p>
-              <p className="text-3xl font-bold text-emerald-700 dark:text-emerald-300">{pastHistory.filter(t => t.status === 'Returned').length}</p>
+            <div className="bg-emerald-100 p-6 py-4 rounded border ">
+              <p className="text-md text-emerald-600 font-bold">Returned Books</p>
+              <p className="text-3xl font-bold text-emerald-400 ">{pastHistory.filter(t => t.status === 'Returned').length}</p>
             </div>
-            <div className="bg-rose-50 dark:bg-rose-900/20 px-6 py-4 rounded-2xl border border-rose-100 dark:border-rose-900/50">
-              <p className="text-sm text-rose-600 dark:text-rose-400 font-medium">Pending Fines</p>
-              <p className="text-3xl font-bold text-rose-700 dark:text-rose-300">
+            <div className="bg-rose-100 p-6 py-4 rounded border ">
+              <p className="text-md text-rose-600 font-bold">Pending Fines</p>
+              <p className="text-3xl font-bold text-rose-400 ">
                 PKR {transactions.reduce((acc, curr) => (!curr.finePaid ? acc + curr.fineAmount : acc), 0)}
               </p>
             </div>
@@ -69,14 +69,14 @@ export default function StudentDashboard() {
 
         <div className="space-y-8">
           {/* Currently Issued Books */}
-          <div className="bg-white dark:bg-slate-800 p-6 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-x-auto">
-            <h2 className="text-xl font-bold mb-4">Currently Issued Books</h2>
+          <div className="bg-white p-6 rounded shadow-sm border  overflow-x-auto">
+            <h2 className="text-xl text-[#0F172B] font-bold mb-4">Currently Issued Books</h2>
             {loading ? <p>Loading...</p> : currentlyIssued.length === 0 ? (
               <p className="text-slate-500">You have no issued books.</p>
             ) : (
-              <table className="w-full text-left border-collapse min-w-max">
-                <thead>
-                  <tr className="border-b border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400">
+              <table className="w-full text-slate-900  text-left  border-collapse min-w-max">
+                <thead className='bg-slate-100'>
+                  <tr className="border text-slate-500 ">
                     <th className="p-3 font-medium">Book Details</th>
                     <th className="p-3 font-medium">Issue Date</th>
                     <th className="p-3 font-medium">Due Date</th>
@@ -86,7 +86,7 @@ export default function StudentDashboard() {
                 </thead>
                 <tbody>
                   {currentlyIssued.map(t => (
-                    <tr key={t._id} className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                    <tr key={t._id} className="border-b border-slate-100  transition-colors">
                       <td className="p-3">
                          <Link to={`/book/${t.book?._id}`} className="font-bold hover:text-blue-600 dark:hover:text-blue-400">{t.book?.title || 'Unknown Book'}</Link>
                       </td>
@@ -96,14 +96,14 @@ export default function StudentDashboard() {
                       </td>
                       <td className="p-3">
                          {t.status === 'Pending_Return' ? (
-                            <span className="px-2 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded-md">Return Requested</span>
+                            <span className="px-2 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded">Return Requested</span>
                          ) : (
-                            <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded-md">Issued</span>
+                            <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded">Issued</span>
                          )}
                       </td>
                       <td className="p-3 text-right">
                          {t.status === 'Issued' && (
-                           <button onClick={() => handleRequestReturn(t._id)} className="px-4 py-2 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-xl text-sm font-semibold transition-colors">
+                           <button onClick={() => handleRequestReturn(t._id)} className="px-4 py-2 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded text-sm font-semibold transition-colors">
                              Request Return
                            </button>
                          )}
@@ -116,14 +116,14 @@ export default function StudentDashboard() {
           </div>
 
           {/* Pending Issue Requests */}
-          <div className="bg-white dark:bg-slate-800 p-6 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-x-auto">
-            <h2 className="text-xl font-bold mb-4">Pending Issue Requests</h2>
+          <div className="bg-white  p-6 rounded shadow-sm border overflow-x-auto">
+            <h2 className="text-xl text-slate-500 font-bold mb-4">Pending Issue Requests</h2>
             {loading ? <p>Loading...</p> : pendingRequests.length === 0 ? (
               <p className="text-slate-500">You have no pending requests.</p>
             ) : (
               <table className="w-full text-left border-collapse min-w-max">
-                <thead>
-                  <tr className="border-b border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400">
+                <thead className='bg-slate-100'>
+                  <tr className=" text-slate-500 ">
                     <th className="p-3 font-medium">Book</th>
                     <th className="p-3 font-medium">Requested Duration</th>
                     <th className="p-3 font-medium">Status</th>
@@ -131,13 +131,13 @@ export default function StudentDashboard() {
                 </thead>
                 <tbody>
                   {pendingRequests.map(t => (
-                    <tr key={t._id} className="border-b border-slate-100 dark:border-slate-800">
+                    <tr key={t._id} className=" text-slate-900">
                       <td className="p-3 font-medium">{t.book?.title || 'Unknown Book'}</td>
-                      <td className="p-3 text-slate-600 dark:text-slate-400">
+                      <td className="p-3 text-slate-600 ">
                          {new Date(t.issueDate).toLocaleDateString()} - {new Date(t.dueDate).toLocaleDateString()}
                       </td>
                       <td className="p-3">
-                         <span className="px-2 py-1 bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300 text-xs font-bold rounded-md">Waiting for Approval</span>
+                         <span className="px-2 py-1 bg-slate-500 text-slate-100  text-xs font-bold rounded">Waiting for Approval</span>
                       </td>
                     </tr>
                   ))}

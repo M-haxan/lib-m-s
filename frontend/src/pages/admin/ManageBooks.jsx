@@ -96,25 +96,25 @@ export default function ManageBooks() {
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="flex justify-between items-center bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
+      <div className="flex justify-between items-center bg-white p-6 rounded shadow-sm border">
         <div>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Manage Books</h1>
           <p className="text-slate-500 dark:text-slate-400 mt-1">Add, update, or remove books from the library catalog.</p>
         </div>
         <button 
           onClick={() => { setEditId(null); setFormData({ title: '', author: '', isbn: '', category: '', publisher: '', year: '', quantity: '', imageUrl: '' }); setShowModal(true); }}
-          className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 hover:-translate-y-0.5 transition-all font-medium"
+          className="px-6 py-3 bg-blue-500 text-white rounded shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 hover:-translate-y-0.5 transition-all font-medium"
         >
           + Add New Book
         </button>
       </div>
 
       {/* Table */}
-      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
+      <div className="bg-white rounded shadow-sm border  overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 text-sm uppercase tracking-wider">
+              <tr className="bg-slate-100  text-slate-500 text-sm uppercase tracking-wider">
                 <th className="px-6 py-4 font-medium">Cover</th>
                 <th className="px-6 py-4 font-medium">Book Details</th>
                 <th className="px-6 py-4 font-medium">Category</th>
@@ -122,29 +122,29 @@ export default function ManageBooks() {
                 <th className="px-6 py-4 font-medium text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
+            <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
               {loading ? (
                 <tr><td colSpan="5" className="px-6 py-8 text-center text-slate-500 animate-pulse">Loading books...</td></tr>
               ) : books.length === 0 ? (
                 <tr><td colSpan="5" className="px-6 py-8 text-center text-slate-500">No books found. Add some!</td></tr>
               ) : (
                 books.map((book) => (
-                  <tr key={book._id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors">
+                  <tr key={book._id} className="hover:bg-slate-50  ">
                     <td className="px-6 py-4">
                       <img src={book.imageUrl || 'https://via.placeholder.com/150'} alt={book.title} className="w-12 h-16 object-cover rounded shadow-sm" />
                     </td>
                     <td className="px-6 py-4">
-                      <div className="font-semibold text-slate-900 dark:text-slate-100">{book.title}</div>
+                      <div className="font-semibold text-slate-500 font-bold capitalize ">{book.title}</div>
                       <div className="text-sm text-slate-500">by {book.author}</div>
-                      <div className="text-xs text-slate-400 mt-1">ISBN: {book.isbn}</div>
+                      <div className="text-xs text-slate-500 mt-1">ISBN: {book.isbn}</div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="px-3 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-full text-xs font-medium">
+                      <span className="px-3 py-1  text-white bg-blue-600 rounded text-xs font-medium">
                         {book.category}
                       </span>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="text-sm">Total: {book.quantity}</div>
+                      <div className="text-sm font-bold text-slate-500">Total: {book.quantity}</div>
                       <div className={`text-sm font-medium ${book.availableCopies > 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
                         Available: {book.availableCopies}
                       </div>

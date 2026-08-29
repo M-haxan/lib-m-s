@@ -30,7 +30,7 @@ function Signin() {
     mutationFn: async (data) => {
       dispatch(signInStart()); // Redux: Loading start
       
-      return await axios.post('http://localhost:3000/api/auth/login', data);
+      return await axios.post('/api/auth/login', data);
       
     },
     onSuccess: (response) => {
@@ -58,7 +58,7 @@ function Signin() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-5rem)] bg-slate-100 flex items-center justify-center p-4">
+    <div className="min-h-[calc(100vh-5rem)] bg-[#FAFAFA] flex items-center justify-center p-4">
     
           <div className="relative bg-white rounded-[2rem] shadow-lg w-full max-w-sm pt-10 pb-8 px-6 sm:px-10 mt-16">
     

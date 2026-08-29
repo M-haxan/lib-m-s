@@ -16,7 +16,7 @@ export default function Catalog() {
     year: ''
   });
 
-  const categories = ['All', 'Fiction', 'Non-Fiction', 'Science', 'History', 'Technology', 'Arts', 'Biography'];
+  const categories = ['Select Category','All', 'Fiction', 'Non-Fiction', 'Science', 'History', 'Technology', 'Arts', 'Biography'];
 
   // Update local search if URL search param changes (from Navbar)
   useEffect(() => {
@@ -59,7 +59,7 @@ export default function Catalog() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 p-6 md:p-12">
+    <div className="min-h-screen bg-[#F8F9FA] text-slate-900  p-6 md:p-12">
       <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
         
         {/* Header section */}
@@ -69,7 +69,7 @@ export default function Catalog() {
         </div>
 
         {/* Search & Filters */}
-        <div className="bg-white dark:bg-slate-800 p-6 rounded-3xl shadow-xl shadow-blue-900/5 border border-slate-100 dark:border-slate-700">
+        <div className="bg-white  p-6 rounded shadow-xl shadow-blue-900/5 border border-slate-100 dark:border-slate-700">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
             {/* Search Bar */}
             <div className="md:col-span-5 relative">
@@ -82,17 +82,18 @@ export default function Catalog() {
                 value={filters.search}
                 onChange={handleFilterChange}
                 placeholder="Search by title or author..."
-                className="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all dark:text-white"
+                className="w-full pl-12 pr-4 py-4 bg-[#F8F9FA]  border  rounded text-slate-500 outline-none transition-all "
               />
             </div>
             
             {/* Category Filter */}
             <div className="md:col-span-3">
                <select
+                
                  name="category"
                  value={filters.category}
                  onChange={handleFilterChange}
-                 className="w-full px-4 py-4 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none appearance-none transition-all dark:text-white"
+                 className="w-full px-4 py-4 bg-[#F8F9FA] border rounded outline-none appearance-none transition-all text-slate-500"
                >
                  {categories.map(c => <option key={c} value={c}>{c}</option>)}
                </select>
@@ -104,7 +105,7 @@ export default function Catalog() {
                  name="availability"
                  value={filters.availability}
                  onChange={handleFilterChange}
-                 className="w-full px-4 py-4 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none appearance-none transition-all dark:text-white"
+                 className="w-full px-4 py-4 bg-[#F8F9FA]  border  rounded  outline-none transition-all  text-slate-500"
                >
                  <option value="all">All Status</option>
                  <option value="true">Available</option>
@@ -120,7 +121,7 @@ export default function Catalog() {
                  value={filters.year}
                  onChange={handleFilterChange}
                  placeholder="Year"
-                 className="w-full px-4 py-4 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all dark:text-white"
+                 className="w-full px-4 py-4 bg-[#F8F9FA]  border  rounded  outline-none transition-all  text-slate-500"
                />
             </div>
           </div>
@@ -148,27 +149,29 @@ export default function Catalog() {
               <Link 
                 to={`/book/${book._id}`} 
                 key={book._id} 
-                className="group flex flex-col bg-white dark:bg-slate-800 rounded-2xl p-3 shadow-sm hover:shadow-xl border border-slate-100 dark:border-slate-700 hover:border-blue-200 dark:hover:border-blue-900/50 transition-all duration-300 hover:-translate-y-1"
+                className="group flex flex-col bg-white  rounded p-3 shadow-sm hover:shadow-xl border  hover:border-blue-200 transition-all duration-300 hover:-translate-y-1"
               >
-                <div className="relative w-full aspect-[2/3] rounded-xl overflow-hidden mb-4 shadow-inner">
+                <div className="relative w-full aspect-[4/5] rounded overflow-hidden mb-4 shadow-inner">
                   <img src={book.imageUrl || 'https://via.placeholder.com/150'} alt={book.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   {book.availableCopies === 0 && (
                     <div className="absolute inset-0 bg-slate-900/60 flex items-center justify-center">
-                      <span className="px-3 py-1 bg-rose-500 text-white text-xs font-bold uppercase tracking-wider rounded-full backdrop-blur-md">Issued Out</span>
+                      <span className="px-3 py-1 bg-rose-500 text-white text-xs font-bold uppercase tracking-wider rounded backdrop-blur-md">Issued Out</span>
                     </div>
                   )}
                 </div>
                 <div className="flex flex-col flex-grow">
-                  <h3 className="font-semibold text-slate-900 dark:text-white line-clamp-1 group-hover:text-blue-600 transition-colors">{book.title}</h3>
-                  <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-1">{book.author}</p>
+                  <h3 className="font-semibold text-slate-900 capitalize group-hover:text-blue-600 transition-colors">{book.title}</h3>
+                  <p className="text-sm text-slate-500 capitalize">{book.author}</p>
                   <div className="mt-auto pt-3 flex justify-between items-center">
-                    <span className="text-xs font-medium px-2 py-1 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-md">
+                    <span className="text-xs font-medium px-2 py-1 bg-slate-100  text-slate-600   rounded">
                       {book.category}
                     </span>
+                    
                     <span className={`text-xs font-semibold ${book.availableCopies > 0 ? 'text-emerald-500' : 'text-slate-400'}`}>
                       {book.availableCopies > 0 ? `${book.availableCopies} available` : '0 available'}
                     </span>
                   </div>
+                  
                 </div>
               </Link>
             ))}
