@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://m-haxan-lib-m-s.hf.space/api/:path*"
+      "destination": "https://lib-m-s-b5df8d0f859c.herokuapp.com/api/:path*"
     },
     {
       "source": "/(.*)",
