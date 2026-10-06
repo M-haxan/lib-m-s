@@ -1,4 +1,11 @@
 {
+  "name": "lib-m-s",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "heroku-postbuild": "cd backend && npm install",
+    "start": "cd backend && node index.js"
+  },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.1",
     "tailwindcss": "^4.3.1"

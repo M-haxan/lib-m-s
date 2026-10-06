@@ -46,6 +46,10 @@ app.use((req, res, next) => {
   next();
 });
 
+app.get('/', (req, res) => {
+  res.send('Library Management System API is running');
+});
+
 app.use('/api/auth', authRouter);
 app.use('/api/books', bookRouter);
 app.use('/api/transactions', transactionRouter);
