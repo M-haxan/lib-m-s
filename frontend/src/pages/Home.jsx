@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { FaArrowRight, FaBookOpen, FaUserGraduate, FaGlobe } from 'react-icons/fa';
+import { ENABLE_DEMO_LOGIN } from '../config/demoCredentials';
 
 export default function Home() {
   return (
@@ -23,11 +24,40 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
             <Link 
               to="/catalog" 
-              className="flex items-center gap-2 px-8 py-4 bg-blue-600 hover:bg-blue-500  text-white rounded font-bold text-lg shadow-xl shadow-blue-500/30 hover:-translate-y-1 transition-all duration-300 w-full sm:w-auto justify-center"
+              className="flex items-center gap-2 px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded font-bold text-lg shadow-xl shadow-blue-500/30 hover:-translate-y-1 transition-all duration-300 w-full sm:w-auto justify-center"
             >
               Browse Catalog <FaArrowRight />
             </Link>
           </div>
+
+          {/* Quick Demo Access for Recruiters & Reviewers (Can be toggled in demoCredentials.js) */}
+          {ENABLE_DEMO_LOGIN && (
+            <div className="bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 border border-blue-200/70 p-4 rounded-xl shadow-sm text-left">
+              <div className="flex items-center justify-between gap-2 mb-2.5">
+                <span className="text-xs font-bold uppercase tracking-wider text-blue-800 bg-blue-100/80 px-2.5 py-1 rounded-full flex items-center gap-1.5">
+                  ⚡ 1-Click Test Access
+                </span>
+                <span className="text-[11px] text-slate-500 font-medium">Recruiter / Visitor Demo</span>
+              </div>
+              <p className="text-xs text-slate-600 mb-3">
+                Experience both portals without manual signup:
+              </p>
+              <div className="flex flex-wrap items-center gap-2.5">
+                <Link
+                  to="/signin?demo=admin"
+                  className="flex-1 min-w-[140px] text-center px-3.5 py-2 text-xs font-bold rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white shadow hover:shadow-md transition-all active:scale-95"
+                >
+                  🛡️ Test as Admin
+                </Link>
+                <Link
+                  to="/signin?demo=student"
+                  className="flex-1 min-w-[140px] text-center px-3.5 py-2 text-xs font-bold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white shadow hover:shadow-md transition-all active:scale-95"
+                >
+                  🎓 Test as Student
+                </Link>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="lg:w-1/2 w-full relative">

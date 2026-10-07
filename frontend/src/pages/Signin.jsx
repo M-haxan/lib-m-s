@@ -1,26 +1,50 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
-import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { signInStart, signInSuccess, signInFailure } from '../redux/authSlice';
 import { IoPersonCircleSharp } from "react-icons/io5";
-import { IoPerson } from "react-icons/io5";
 import { MdEmail } from "react-icons/md";
-import { RiLockPasswordFill } from "react-icons/ri"
-import toast from 'react-hot-toast'
-import API from '../api/axios'
-
-
+import { RiLockPasswordFill } from "react-icons/ri";
+import { FaShieldAlt, FaUserGraduate, FaBolt } from "react-icons/fa";
+import toast from 'react-hot-toast';
+import API from '../api/axios';
+import { DEMO_CREDENTIALS, ENABLE_DEMO_LOGIN } from '../config/demoCredentials';
 
 function Signin() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [searchParams] = useSearchParams();
 
-  const [loadings, setLoading] = useState(false)
-  const { loading, error } = useSelector((state) => state.user);
-
+  const { loading } = useSelector((state) => state.user);
   const [formData, setFormData] = useState({ email: '', password: '' });
+
+  useEffect(() => {
+    if (!ENABLE_DEMO_LOGIN) return;
+    const demo = searchParams.get('demo');
+    if (demo && DEMO_CREDENTIALS[demo]) {
+      setFormData({
+        email: DEMO_CREDENTIALS[demo].email,
+        password: DEMO_CREDENTIALS[demo].password
+      });
+      toast.success(`Loaded ${DEMO_CREDENTIALS[demo].label} credentials!`, {
+        icon: '⚡',
+        duration: 3000
+      });
+    }
+  }, [searchParams]);
+
+  const handleFillDemo = (role) => {
+    if (DEMO_CREDENTIALS[role]) {
+      setFormData({
+        email: DEMO_CREDENTIALS[role].email,
+        password: DEMO_CREDENTIALS[role].password
+      });
+      toast.success(`${DEMO_CREDENTIALS[role].label} credentials filled!`, {
+        icon: '🔑'
+      });
+    }
+  };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -29,15 +53,11 @@ function Signin() {
   const loginMutation = useMutation({
     mutationFn: async (data) => {
       dispatch(signInStart());
-
       return await API.post('/api/auth/login', data);
-
     },
     onSuccess: (response) => {
-
       dispatch(signInSuccess(response.data));
-      toast.success("user loged in Successfuly");
-      setLoading(false)
+      toast.success("User logged in successfully");
 
       if (response.data.role === 'admin') {
         navigate('/admin-dashboard');
@@ -46,7 +66,6 @@ function Signin() {
       }
     },
     onError: (err) => {
-
       dispatch(signInFailure(err.response?.data?.message || 'Login Failed!'));
       toast.error(err.response?.data?.message || 'Login Failed!');
     }
@@ -59,78 +78,102 @@ function Signin() {
 
   return (
     <div className="min-h-[calc(100vh-5rem)] bg-[#FAFAFA] flex items-center justify-center p-4">
-
-      <div className="relative bg-white rounded shadow-lg w-full max-w-sm pt-10 pb-8 px-6 sm:px-10 mt-16">
-
-        <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-white rounded-full p-5 ">
-          <IoPersonCircleSharp className="fa-regular fa-user text-3xl text-gray-400" />
+      <div className="relative bg-white rounded-xl shadow-xl w-full max-w-sm pt-10 pb-8 px-6 sm:px-8 mt-16 border border-slate-100">
+        <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-white rounded-full p-4 shadow-md border border-slate-100">
+          <IoPersonCircleSharp className="text-4xl text-blue-600" />
         </div>
 
-        <h2 className="text-center text-gray-400 text-2xl font-light tracking-widest mb-8">
+        <h2 className="text-center text-gray-800 text-2xl font-bold tracking-tight mb-2">
           Welcome Back
         </h2>
-        <form onSubmit={handleSubmit} >
+        <p className="text-center text-xs text-slate-500 mb-6">
+          Sign in to manage your library account
+        </p>
 
+        {/* 1-Click Quick Demo Test Buttons (Can be toggled in demoCredentials.js) */}
+        {ENABLE_DEMO_LOGIN && (
+          <div className="bg-slate-50 border border-slate-200/80 rounded-lg p-3 mb-6">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[11px] font-bold text-slate-700 flex items-center gap-1">
+                <FaBolt className="text-amber-500 text-xs" /> Quick Test / Demo:
+              </span>
+              <span className="text-[10px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-semibold">
+                1-Click
+              </span>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => handleFillDemo('admin')}
+                className="flex items-center justify-center gap-1.5 px-2.5 py-2 text-xs font-semibold rounded-md bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300 transition-all active:scale-95 cursor-pointer shadow-sm"
+              >
+                <FaShieldAlt className="text-indigo-600 text-xs" /> Test Admin
+              </button>
+              <button
+                type="button"
+                onClick={() => handleFillDemo('student')}
+                className="flex items-center justify-center gap-1.5 px-2.5 py-2 text-xs font-semibold rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 hover:border-emerald-300 transition-all active:scale-95 cursor-pointer shadow-sm"
+              >
+                <FaUserGraduate className="text-emerald-600 text-xs" /> Test Student
+              </button>
+            </div>
+          </div>
+        )}
 
-          <div className="flex bg-[#dcdcdc] mb-4  overflow-hidden">
-            <div className="bg-[#cccccc] px-4 py-3 flex items-center justify-center">
-              <MdEmail className="text-gray-600" />
+        <form onSubmit={handleSubmit}>
+          <div className="flex bg-[#f1f3f5] rounded-lg mb-3 overflow-hidden border border-slate-200 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-100 transition-all">
+            <div className="bg-[#e9ecef] px-3.5 py-2.5 flex items-center justify-center">
+              <MdEmail className="text-gray-500" />
             </div>
             <input
-              type="text"
-              placeholder="Email"
-              className="bg-transparent w-full  px-4 py-2 font-bold text-sm text- outline-none placeholder-gray-400"
-              id='email'
+              type="email"
+              placeholder="Email address"
+              className="bg-transparent w-full px-3 py-2 text-sm text-slate-800 outline-none placeholder-gray-400 font-medium"
+              id="email"
+              value={formData.email}
               onChange={handleChange}
-
+              required
             />
           </div>
 
-
-          <div className="flex bg-[#dcdcdc] mb-4 overflow-hidden">
-            <div className="bg-[#cccccc] px-4 py-2 flex items-center justify-center">
-              <RiLockPasswordFill className="text-gray-600" />
+          <div className="flex bg-[#f1f3f5] rounded-lg mb-3 overflow-hidden border border-slate-200 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-100 transition-all">
+            <div className="bg-[#e9ecef] px-3.5 py-2.5 flex items-center justify-center">
+              <RiLockPasswordFill className="text-gray-500" />
             </div>
             <input
               type="password"
-              placeholder="***********"
-              className="bg-transparent w-full px-4 py-2 text-sm text-gray-700 outline-none placeholder-gray-400"
-              id='password'
+              placeholder="Password"
+              className="bg-transparent w-full px-3 py-2 text-sm text-slate-800 outline-none placeholder-gray-400"
+              id="password"
+              value={formData.password}
               onChange={handleChange}
-
+              required
             />
           </div>
-          <div className="flex justify-end mb-4 -mt-2">
-            <Link to="/forgot-password" className="text-xs text-blue-500 hover:underline hover:text-blue-600 font-semibold transition-colors">
+
+          <div className="flex justify-end mb-4">
+            <Link to="/forgot-password" className="text-xs text-blue-600 hover:underline font-medium transition-colors">
               Forgot Password?
             </Link>
           </div>
-
-
-
-
 
           <div className="w-full flex flex-col gap-2">
             <button
               disabled={loading}
               type="submit"
-              className="w-full bg-blue-600 text-white py-2 font-semibold tracking-widest text-sm hover:bg-blue-500 transition-colors"
+              className="w-full bg-blue-600 text-white py-2.5 rounded-lg font-semibold tracking-wide text-sm hover:bg-blue-500 shadow-md shadow-blue-500/20 active:scale-[0.99] transition-all cursor-pointer disabled:opacity-60"
             >
-              {loading ? 'Sign in ...' : 'Sign In'}
-
+              {loading ? 'Signing in...' : 'Sign In'}
             </button>
-
-
           </div>
 
-          <p className="text-gray-400 text-[13px] text-center mt-6">
+          <p className="text-gray-500 text-[13px] text-center mt-6">
             Don't have an account?{' '}
-            <Link to='/signup' className="text-blue-500 hover:underline transition-colors">
+            <Link to="/signup" className="text-blue-600 font-semibold hover:underline transition-colors">
               Sign Up
             </Link>
           </p>
         </form>
-
       </div>
     </div>
   );
